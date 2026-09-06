@@ -1,4 +1,6 @@
 #include "lox.hpp"
+#include "astprinter.hpp"
+#include "parser.hpp"
 #include "scanner.hpp"
 #include "token.hpp"
 
@@ -49,6 +51,16 @@ void Lox::runPrompt() {
 void Lox::run(std::string &source) {
   Scanner scanner{source};
   std::vector<Token> tokens{scanner.scan_tokens()};
+
+  Parser<std::string> parser{tokens};
+  auto expression{parser.parse()};
+
+  if (had_error)
+    return;
+
+  AstPrinter astprinter{};
+
+  std::cout << astprinter.print(*expression) << "\n";
 
   for (const auto token : tokens) {
     std::cout << token << "\n";

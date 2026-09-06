@@ -12,6 +12,8 @@ std::vector<Token> Scanner::scan_tokens() {
     scan_token();
   }
 
+  m_tokens.emplace_back(EOFILE, "", std::monostate{}, m_line);
+
   return m_tokens;
 }
 
@@ -117,7 +119,7 @@ void Scanner::identifier() {
   while (std::isalnum(peek()))
     advance();
 
-  auto text{m_source.substr(m_start, m_current)};
+  auto text{m_source.substr(m_start, m_current - m_start)};
   auto keyword{m_keywords.find(text)};
 
   TokenType type{};
@@ -149,7 +151,7 @@ void Scanner::string() {
   // skip the trailing "
   advance();
 
-  auto value{m_source.substr(m_start + 1, m_current - 2)};
+  auto value{m_source.substr(m_start + 1, m_current - (m_start + 3))};
   add_token(STRING, value);
 }
 
@@ -163,7 +165,7 @@ void Scanner::number() {
       advance();
   }
 
-  double value{std::stod(m_source.substr(m_start, m_current))};
+  double value{std::stod(m_source.substr(m_start, m_current - m_start))};
 
   add_token(NUMBER, value);
 }
@@ -197,8 +199,8 @@ char Scanner::advance() { return m_source[m_current++]; }
 
 void Scanner::add_token(TokenType type) { add_token(type, std::monostate()); }
 
-void Scanner::add_token(TokenType type, Literal literal) {
-  auto lexeme{m_source.substr(m_start, m_current)};
+void Scanner::add_token(TokenType type, Object literal) {
+  auto lexeme{m_source.substr(m_start, m_current - m_start)};
 
   m_tokens.emplace_back(type, lexeme, literal, m_line);
 }

@@ -6,4 +6,5 @@ set(CMAKE_CXX_COMPILER clang++)
 set(CMAKE_CXX_STANDARD 26)
 
 
-add_executable(${PROJECT_NAME} main.cpp token.cpp scanner.cpp lox.cpp)
+add_executable(${PROJECT_NAME} main.cpp token.cpp
+  scanner.cpp lox.cpp expression.cpp astprinter.cpp parser.cpp)

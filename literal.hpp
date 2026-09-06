@@ -3,9 +3,9 @@
 #include <string>
 #include <variant>
 
-using Literal = std::variant<std::monostate, double, std::string, bool>;
+using Object = std::variant<std::monostate, double, std::string, bool>;
 
-inline std::string literal_to_string(const Literal &literal) {
+inline std::string literal_to_string(const Object &literal) {
   return std::visit(
       [](const auto &value) -> std::string {
         using T = std::decay_t<decltype(value)>;

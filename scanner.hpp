@@ -22,7 +22,7 @@ private:
   char peek_next();
   char advance();
   void add_token(TokenType type);
-  void add_token(TokenType type, Literal literal);
+  void add_token(TokenType type, Object literal);
   bool is_at_end() const;
 
   std::string m_source{};
