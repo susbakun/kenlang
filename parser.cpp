@@ -3,6 +3,7 @@
 #include "lox.hpp"
 #include "tokentype.hpp"
 #include <memory>
+#include <sys/types.h>
 #include <variant>
 
 template <typename T> std::unique_ptr<Expr<T>> Parser<T>::expression() {
@@ -10,13 +11,30 @@ template <typename T> std::unique_ptr<Expr<T>> Parser<T>::expression() {
 }
 
 template <typename T> std::unique_ptr<Expr<T>> Parser<T>::comma() {
-  auto expr{equality()};
+  auto expr{ternary()};
 
   while (match({COMMA})) {
     auto op{previous()};
-    auto right{equality()};
+    auto right{ternary()};
 
     expr = std::make_unique<Binary<T>>(std::move(expr), op, std::move(right));
+  }
+
+  return expr;
+}
+
+template <typename T> std::unique_ptr<Expr<T>> Parser<T>::ternary() {
+  auto expr{equality()};
+
+  if (match({QUESTION_MARK})) {
+    auto left_operator{previous()};
+    auto mid{equality()};
+    auto right_operator{consume(COLON, "Unexped token")};
+    auto right{ternary()};
+
+    expr = std::make_unique<Ternary<T>>(std::move(expr), left_operator,
+                                        std::move(mid), right_operator,
+                                        std::move(right));
   }
 
   return expr;

@@ -48,6 +48,9 @@ void Scanner::scan_token() {
   case ';':
     add_token(SEMICOLON);
     break;
+  case ':':
+    add_token(COLON);
+    break;
   case '*':
     add_token(STAR);
     break;
@@ -63,6 +66,11 @@ void Scanner::scan_token() {
   case '>':
     add_token(match('=') ? GREATER_EQUAL : GREATER);
     break;
+
+  case '?':
+    add_token(QUESTION_MARK);
+    break;
+
   case '/':
     if (match('/')) {
       while ((peek() != '\n') && !is_at_end())

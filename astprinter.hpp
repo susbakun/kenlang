@@ -16,6 +16,7 @@ public:
   std::string visit_grouping_expr(Grouping<std::string> &expr) const override;
   std::string visit_literal_expr(Literal<std::string> &expr) const override;
   std::string visit_unary_expr(Unary<std::string> &expr) const override;
+  std::string visit_ternary_expr(Ternary<std::string> &expr) const override;
 
 private:
   std::string

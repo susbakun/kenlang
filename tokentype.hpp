@@ -26,6 +26,10 @@ enum TokenType {
   LESS,
   LESS_EQUAL,
 
+  // ternary
+  QUESTION_MARK,
+  COLON,
+
   // literals
   IDENTIFIER,
   STRING,

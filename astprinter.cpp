@@ -1,4 +1,5 @@
 #include "astprinter.hpp"
+#include "expression.hpp"
 #include <variant>
 
 std::string AstPrinter::visit_binary_expr(Binary<std::string> &expr) const {
@@ -19,6 +20,11 @@ std::string AstPrinter::visit_literal_expr(Literal<std::string> &expr) const {
 
 std::string AstPrinter::visit_unary_expr(Unary<std::string> &expr) const {
   return parenthesize(expr.m_operator.m_lexeme, {expr.m_right.get()});
+}
+
+std::string AstPrinter::visit_ternary_expr(Ternary<std::string> &expr) const {
+  return parenthesize(
+      "ternary", {expr.m_left.get(), expr.m_mid.get(), expr.m_right.get()});
 }
 
 std::string AstPrinter::parenthesize(
