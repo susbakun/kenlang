@@ -22,6 +22,7 @@ public:
 
 private:
   std::unique_ptr<Expr<T>> expression();
+  std::unique_ptr<Expr<T>> comma();
   std::unique_ptr<Expr<T>> equality();
   std::unique_ptr<Expr<T>> comparison();
   std::unique_ptr<Expr<T>> term();

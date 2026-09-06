@@ -6,7 +6,20 @@
 #include <variant>
 
 template <typename T> std::unique_ptr<Expr<T>> Parser<T>::expression() {
-  return equality();
+  return comma();
+}
+
+template <typename T> std::unique_ptr<Expr<T>> Parser<T>::comma() {
+  auto expr{equality()};
+
+  while (match({COMMA})) {
+    auto op{previous()};
+    auto right{equality()};
+
+    expr = std::make_unique<Binary<T>>(std::move(expr), op, std::move(right));
+  }
+
+  return expr;
 }
 
 template <typename T> std::unique_ptr<Expr<T>> Parser<T>::equality() {
