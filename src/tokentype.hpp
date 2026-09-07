@@ -101,6 +101,12 @@ inline constexpr std::string_view get_tokentype_str(TokenType type) {
   case LESS_EQUAL:
     return "LESS_EQUAL";
 
+    // ternary
+  case QUESTION_MARK:
+    return "QUESTION_MARK";
+  case COLON:
+    return "COLON";
+
     // literals
   case IDENTIFIER:
     return "IDENTIFIER";
