@@ -15,7 +15,5 @@ int main(int argc, char *argv[]) {
     lox.runPrompt();
   }
 
-  std::cerr << "BEFORE EXIT\n";
-
   return 0;
 }

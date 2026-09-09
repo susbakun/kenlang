@@ -1,5 +1,6 @@
 #pragma once
 
+#include <sstream>
 #include <string>
 #include <variant>
 
@@ -16,8 +17,12 @@ inline std::string literal_to_string(const Object &literal) {
           return value;
         } else if constexpr (std::is_same_v<T, bool>) {
           return value ? "true" : "false";
+        } else if constexpr (std::is_same_v<T, double>) {
+          std::ostringstream out;
+          out << value;
+          return out.str();
         } else {
-          return std::to_string(value);
+          std::to_string(value);
         }
       },
       literal);

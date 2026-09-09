@@ -12,14 +12,17 @@ public:
     return expr.accept(*this);
   }
 
-  std::string visit_binary_expr(Binary<std::string> &expr) const override;
-  std::string visit_grouping_expr(Grouping<std::string> &expr) const override;
-  std::string visit_literal_expr(Literal<std::string> &expr) const override;
-  std::string visit_unary_expr(Unary<std::string> &expr) const override;
-  std::string visit_ternary_expr(Ternary<std::string> &expr) const override;
+  std::string visit_binary_expr(const Binary<std::string> &expr) const override;
+  std::string
+  visit_grouping_expr(const Grouping<std::string> &expr) const override;
+  std::string
+  visit_literal_expr(const Literal<std::string> &expr) const override;
+  std::string visit_unary_expr(const Unary<std::string> &expr) const override;
+  std::string
+  visit_ternary_expr(const Ternary<std::string> &expr) const override;
 
 private:
   std::string
-  parenthesize(std::string_view name,
-               std::initializer_list<Expr<std::string> *> exprs) const;
+  parenthesize(const std::string_view name,
+               const std::initializer_list<Expr<std::string> *> exprs) const;
 };

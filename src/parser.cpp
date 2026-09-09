@@ -1,5 +1,6 @@
 #include "parser.hpp"
 #include "expression.hpp"
+#include "literal.hpp"
 #include "lox.hpp"
 #include "tokentype.hpp"
 #include <memory>
@@ -204,3 +205,4 @@ template <typename T> std::unique_ptr<Expr<T>> Parser<T>::parse() {
 }
 
 template class Parser<std::string>;
+template class Parser<Object>;

@@ -1,5 +1,5 @@
 #include "lox.hpp"
-#include "astprinter.hpp"
+#include "literal.hpp"
 #include "parser.hpp"
 #include "scanner.hpp"
 #include "token.hpp"
@@ -34,6 +34,9 @@ void Lox::runFile(char path[]) {
 
   if (had_error)
     std::exit(65);
+
+  if (had_runtime_error)
+    std::exit(70);
 }
 
 void Lox::runPrompt() {
@@ -52,17 +55,19 @@ void Lox::run(std::string &source) {
   Scanner scanner{source};
   std::vector<Token> tokens{scanner.scan_tokens()};
 
-  Parser<std::string> parser{tokens};
+  Parser<Object> parser{tokens};
   auto expression{parser.parse()};
 
   if (had_error)
     return;
 
-  AstPrinter astprinter{};
+  // AstPrinter astprinter{};
 
-  std::cout << astprinter.print(*expression) << "\n";
+  // std::cout << astprinter.print(*expression) << "\n";
 
-  for (const auto token : tokens) {
-    std::cout << token << "\n";
-  }
+  // for (const auto token : tokens) {
+  //   std::cout << token << "\n";
+  // }
+
+  interpreter.interpret(*expression);
 }

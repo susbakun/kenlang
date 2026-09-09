@@ -1,8 +1,12 @@
 #pragma once
 
+#include "interpreter.hpp"
+#include "runtime_error.hpp"
 #include "token.hpp"
 #include "tokentype.hpp"
+#include <iostream>
 #include <print>
+#include <string>
 #include <string_view>
 
 class Lox {
@@ -25,6 +29,13 @@ public:
     }
   }
 
+  static inline void runtime_error(RuntimeError &error) {
+    std::cerr << error.what()
+              << "\n[line " + std::to_string(error.get_token().m_line) << "]"
+              << "\n";
+    had_runtime_error = true;
+  }
+
   static inline void report(int line, std::string_view where,
                             std::string_view error) {
     std::println("[line {}] Error{}: {}", line, where, error);
@@ -33,4 +44,6 @@ public:
 
 private:
   static inline bool had_error{false};
+  static inline bool had_runtime_error{false};
+  static inline Interpreter interpreter{};
 };

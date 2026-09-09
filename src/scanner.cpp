@@ -159,7 +159,7 @@ void Scanner::string() {
   // skip the trailing "
   advance();
 
-  auto value{m_source.substr(m_start + 1, m_current - (m_start + 3))};
+  auto value{m_source.substr(m_start + 1, m_current - (m_start + 2))};
   add_token(STRING, value);
 }
 
@@ -169,6 +169,8 @@ void Scanner::number() {
   }
 
   if ((peek() == '.') && std::isdigit(peek_next())) {
+    // consume .
+    advance();
     while (std::isdigit(peek()))
       advance();
   }
