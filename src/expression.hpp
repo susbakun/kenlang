@@ -10,7 +10,7 @@ template <typename T> class Literal;
 template <typename T> class Unary;
 template <typename T> class Ternary;
 
-template <typename T> struct Visitor {
+template <typename T> struct ExprVisitor {
   virtual T visit_binary_expr(const Binary<T> &expr) const = 0;
   virtual T visit_grouping_expr(const Grouping<T> &expr) const = 0;
   virtual T visit_literal_expr(const Literal<T> &expr) const = 0;
@@ -20,7 +20,7 @@ template <typename T> struct Visitor {
 
 template <typename T> class Expr {
 public:
-  virtual T accept(const Visitor<T> &) const = 0;
+  virtual T accept(const ExprVisitor<T> &) const = 0;
 
   virtual ~Expr() = default;
 };
@@ -31,7 +31,7 @@ public:
          std::unique_ptr<Expr<T>> right)
       : m_left{std::move(left)}, m_op{op}, m_right{std::move(right)} {}
 
-  T accept(const Visitor<T> &visitor) const override;
+  T accept(const ExprVisitor<T> &visitor) const override;
 
   const std::unique_ptr<Expr<T>> m_left;
   const Token m_op;
@@ -43,7 +43,7 @@ public:
   Grouping(std::unique_ptr<Expr<T>> expression)
       : m_expression{std::move(expression)} {}
 
-  T accept(const Visitor<T> &visitor) const override;
+  T accept(const ExprVisitor<T> &visitor) const override;
 
   const std::unique_ptr<Expr<T>> m_expression;
 };
@@ -52,7 +52,7 @@ template <typename T> class Literal : public Expr<T> {
 public:
   Literal(Object value) : m_value{value} {}
 
-  T accept(const Visitor<T> &visitor) const override;
+  T accept(const ExprVisitor<T> &visitor) const override;
 
   const Object m_value{};
 };
@@ -62,7 +62,7 @@ public:
   Unary(Token &op, std::unique_ptr<Expr<T>> right)
       : m_operator{op}, m_right{std::move(right)} {}
 
-  T accept(const Visitor<T> &visitor) const override;
+  T accept(const ExprVisitor<T> &visitor) const override;
 
   const Token m_operator;
   const std::unique_ptr<Expr<T>> m_right;
@@ -77,7 +77,7 @@ public:
         m_mid{std::move(mid)}, m_right_operator{right_operator},
         m_right{std::move(right)} {}
 
-  T accept(const Visitor<T> &visitor) const override;
+  T accept(const ExprVisitor<T> &visitor) const override;
 
   const std::unique_ptr<Expr<T>> m_left;
   const Token m_left_operator;

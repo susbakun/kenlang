@@ -4,7 +4,7 @@
 #include "literal.hpp"
 #include "token.hpp"
 
-class Interpreter : public Visitor<Object> {
+class Interpreter : public ExprVisitor<Object> {
 public:
   Object visit_literal_expr(const Literal<Object> &expr) const override;
   Object visit_grouping_expr(const Grouping<Object> &expr) const override;

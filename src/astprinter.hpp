@@ -6,7 +6,7 @@
 #include <initializer_list>
 #include <string>
 
-class AstPrinter : public Visitor<std::string> {
+class AstPrinter : public ExprVisitor<std::string> {
 public:
   inline std::string print(Expr<std::string> &expr) {
     return expr.accept(*this);
