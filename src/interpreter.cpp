@@ -3,22 +3,25 @@
 #include "literal.hpp"
 #include "lox.hpp"
 #include "runtime_error.hpp"
+#include "statement.hpp"
 #include "tokentype.hpp"
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include <type_traits>
 #include <variant>
+#include <vector>
 
-Object Interpreter::visit_literal_expr(const Literal<Object> &expr) const {
+Object Interpreter::visit_literal_expr(const Literal &expr) const {
   return expr.m_value;
 }
 
-Object Interpreter::visit_grouping_expr(const Grouping<Object> &expr) const {
+Object Interpreter::visit_grouping_expr(const Grouping &expr) const {
   return evaluate(*expr.m_expression);
 }
 
-Object Interpreter::visit_unary_expr(const Unary<Object> &expr) const {
+Object Interpreter::visit_unary_expr(const Unary &expr) const {
   auto right{evaluate(*expr.m_right)};
 
   switch (expr.m_operator.m_type) {
@@ -33,7 +36,7 @@ Object Interpreter::visit_unary_expr(const Unary<Object> &expr) const {
   }
 }
 
-Object Interpreter::visit_binary_expr(const Binary<Object> &expr) const {
+Object Interpreter::visit_binary_expr(const Binary &expr) const {
   auto left{evaluate(*expr.m_left)};
   auto right{evaluate(*expr.m_right)};
 
@@ -99,7 +102,7 @@ Object Interpreter::visit_binary_expr(const Binary<Object> &expr) const {
   }
 }
 
-Object Interpreter::visit_ternary_expr(const Ternary<Object> &expr) const {
+Object Interpreter::visit_ternary_expr(const Ternary &expr) const {
   auto left{evaluate(*expr.m_left)};
   auto mid{evaluate(*expr.m_mid)};
   auto right{evaluate(*expr.m_right)};
@@ -118,7 +121,16 @@ Object Interpreter::visit_ternary_expr(const Ternary<Object> &expr) const {
   }
 }
 
-Object Interpreter::evaluate(const Expr<Object> &expr) const {
+void Interpreter::visit_expression_stmt(const Expression &stmt) const {
+  evaluate(*stmt.m_expression);
+}
+
+void Interpreter::visit_print_stmt(const Print &stmt) const {
+  auto value{evaluate(*stmt.m_expression)};
+  std::cout << literal_to_string(value) << "\n";
+}
+
+Object Interpreter::evaluate(const Expr &expr) const {
   return expr.accept(*this);
 }
 
@@ -176,11 +188,15 @@ void Interpreter::check_zero_division(const Token &op,
   throw RuntimeError{op, "Zero division error"};
 }
 
-void Interpreter::interpret(const Expr<Object> &expr) const {
+void Interpreter::interpret(
+    const std::vector<std::unique_ptr<Stmt>> &statements) const {
   try {
-    auto value{evaluate(expr)};
-    std::cout << literal_to_string(value) << "\n";
+    for (const auto &stmt : statements) {
+      execute(*stmt);
+    }
   } catch (RuntimeError &error) {
     Lox::runtime_error(error);
   }
 }
+
+void Interpreter::execute(const Stmt &stmt) const { stmt.accept(*this); }

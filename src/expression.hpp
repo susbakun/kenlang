@@ -4,84 +4,85 @@
 #include "token.hpp"
 #include <memory>
 
-template <typename T> class Binary;
-template <typename T> class Grouping;
-template <typename T> class Literal;
-template <typename T> class Unary;
-template <typename T> class Ternary;
+class Binary;
+class Grouping;
+class Literal;
+class Unary;
+class Ternary;
 
-template <typename T> struct ExprVisitor {
-  virtual T visit_binary_expr(const Binary<T> &expr) const = 0;
-  virtual T visit_grouping_expr(const Grouping<T> &expr) const = 0;
-  virtual T visit_literal_expr(const Literal<T> &expr) const = 0;
-  virtual T visit_unary_expr(const Unary<T> &expr) const = 0;
-  virtual T visit_ternary_expr(const Ternary<T> &expr) const = 0;
+struct ExprVisitor {
+  virtual Object visit_binary_expr(const Binary &expr) const = 0;
+  virtual Object visit_grouping_expr(const Grouping &expr) const = 0;
+  virtual Object visit_literal_expr(const Literal &expr) const = 0;
+  virtual Object visit_unary_expr(const Unary &expr) const = 0;
+  virtual Object visit_ternary_expr(const Ternary &expr) const = 0;
+
+  virtual ~ExprVisitor() = default;
 };
 
-template <typename T> class Expr {
+class Expr {
 public:
-  virtual T accept(const ExprVisitor<T> &) const = 0;
+  virtual Object accept(const ExprVisitor &) const = 0;
 
   virtual ~Expr() = default;
 };
 
-template <typename T> class Binary : public Expr<T> {
+class Binary : public Expr {
 public:
-  Binary(std::unique_ptr<Expr<T>> left, Token &op,
-         std::unique_ptr<Expr<T>> right)
+  Binary(std::unique_ptr<Expr> left, Token &op, std::unique_ptr<Expr> right)
       : m_left{std::move(left)}, m_op{op}, m_right{std::move(right)} {}
 
-  T accept(const ExprVisitor<T> &visitor) const override;
+  Object accept(const ExprVisitor &visitor) const override;
 
-  const std::unique_ptr<Expr<T>> m_left;
+  const std::unique_ptr<Expr> m_left;
   const Token m_op;
-  const std::unique_ptr<Expr<T>> m_right;
+  const std::unique_ptr<Expr> m_right;
 };
 
-template <typename T> class Grouping : public Expr<T> {
+class Grouping : public Expr {
 public:
-  Grouping(std::unique_ptr<Expr<T>> expression)
+  Grouping(std::unique_ptr<Expr> expression)
       : m_expression{std::move(expression)} {}
 
-  T accept(const ExprVisitor<T> &visitor) const override;
+  Object accept(const ExprVisitor &visitor) const override;
 
-  const std::unique_ptr<Expr<T>> m_expression;
+  const std::unique_ptr<Expr> m_expression;
 };
 
-template <typename T> class Literal : public Expr<T> {
+class Literal : public Expr {
 public:
   Literal(Object value) : m_value{value} {}
 
-  T accept(const ExprVisitor<T> &visitor) const override;
+  Object accept(const ExprVisitor &visitor) const override;
 
   const Object m_value{};
 };
 
-template <typename T> class Unary : public Expr<T> {
+class Unary : public Expr {
 public:
-  Unary(Token &op, std::unique_ptr<Expr<T>> right)
+  Unary(Token &op, std::unique_ptr<Expr> right)
       : m_operator{op}, m_right{std::move(right)} {}
 
-  T accept(const ExprVisitor<T> &visitor) const override;
+  Object accept(const ExprVisitor &visitor) const override;
 
   const Token m_operator;
-  const std::unique_ptr<Expr<T>> m_right;
+  const std::unique_ptr<Expr> m_right;
 };
 
-template <typename T> class Ternary : public Expr<T> {
+class Ternary : public Expr {
 public:
-  Ternary(std::unique_ptr<Expr<T>> left, Token &left_operator,
-          std::unique_ptr<Expr<T>> mid, Token &right_operator,
-          std::unique_ptr<Expr<T>> right)
+  Ternary(std::unique_ptr<Expr> left, Token &left_operator,
+          std::unique_ptr<Expr> mid, Token &right_operator,
+          std::unique_ptr<Expr> right)
       : m_left{std::move(left)}, m_left_operator{left_operator},
         m_mid{std::move(mid)}, m_right_operator{right_operator},
         m_right{std::move(right)} {}
 
-  T accept(const ExprVisitor<T> &visitor) const override;
+  Object accept(const ExprVisitor &visitor) const override;
 
-  const std::unique_ptr<Expr<T>> m_left;
+  const std::unique_ptr<Expr> m_left;
   const Token m_left_operator;
-  const std::unique_ptr<Expr<T>> m_mid;
+  const std::unique_ptr<Expr> m_mid;
   const Token m_right_operator;
-  const std::unique_ptr<Expr<T>> m_right;
+  const std::unique_ptr<Expr> m_right;
 };

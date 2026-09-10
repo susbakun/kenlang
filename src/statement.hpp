@@ -4,60 +4,58 @@
 #include <memory>
 #include <vector>
 
-template <typename T> class Expression;
-template <typename T> class Block;
-template <typename T> class Print;
-template <typename T> class Var;
+class Expression;
+class Print;
 
-template <typename T> struct StmtVisitor {
-  virtual T visit_block_stmt(const Block<T> &stmt) const = 0;
-  virtual T visit_expression_stmt(const Expression<T> &stmt) const = 0;
-  virtual T visit_print_stmt(const Print<T> &stmt) const = 0;
-  virtual T visit_var_stmt(const Var<T> &stmt) const = 0;
+struct StmtVisitor {
+  virtual void visit_expression_stmt(const Expression &stmt) const = 0;
+  virtual void visit_print_stmt(const Print &stmt) const = 0;
+
+  virtual ~StmtVisitor() = default;
 };
 
-template <typename T> class Stmt {
+class Stmt {
 public:
-  virtual T accept(const StmtVisitor<T> &) const = 0;
+  virtual void accept(const StmtVisitor &) const = 0;
+
+  virtual ~Stmt() = default;
 };
 
-template <typename T> class Block : public Stmt<T> {
+class Block : public Stmt {
 public:
-  Block(std::vector<std::unique_ptr<Stmt<T>>> &statements)
-      : m_statements{statements} {}
+  Block(std::vector<std::unique_ptr<Stmt>> &statements)
+      : m_statements{std::move(statements)} {}
 
-  T accept(const StmtVisitor<T> &visitor) const override;
+  void accept(const StmtVisitor &visitor) const override;
 
-private:
-  const std::vector<std::unique_ptr<Stmt<T>>> m_statements{};
+  const std::vector<std::unique_ptr<Stmt>> m_statements{};
 };
 
-template <typename T> class Expression : public Stmt<T> {
+class Expression : public Stmt {
 public:
-  Expression(const Expr<T> &expression) : m_expression{expression} {}
+  Expression(std::unique_ptr<Expr> expression)
+      : m_expression{std::move(expression)} {}
 
-  T accept(const StmtVisitor<T> &visitor) const override;
+  void accept(const StmtVisitor &visitor) const override;
 
-private:
-  const std::unique_ptr<Expr<T>> m_expression{};
+  const std::unique_ptr<Expr> m_expression{};
 };
 
-template <typename T> class Print : public Stmt<T> {
+class Print : public Stmt {
 public:
-  Print(const Expr<T> &expression) : m_expression{expression} {}
+  Print(std::unique_ptr<Expr> expression)
+      : m_expression{std::move(expression)} {}
 
-  T accept(const StmtVisitor<T> &visitor) const override;
+  void accept(const StmtVisitor &visitor) const override;
 
-private:
-  const std::unique_ptr<Expr<T>> m_expression{};
+  const std::unique_ptr<Expr> m_expression{};
 };
 
-template <typename T> class Var : public Stmt<T> {
+class Var : public Stmt {
 public:
-  Var(const Token &name, const Expr<T> &initilizer)
-      : m_name{name}, m_initilizer{initilizer} {}
+  Var(const Token &name, std::unique_ptr<Expr> initilizer)
+      : m_name{name}, m_initilizer{std::move(initilizer)} {}
 
-private:
   const Token m_name;
-  const Expr<T> m_initilizer{};
+  const std::unique_ptr<Expr> m_initilizer{};
 };

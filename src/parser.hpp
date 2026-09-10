@@ -1,6 +1,7 @@
 #pragma once
 
 #include "expression.hpp"
+#include "statement.hpp"
 #include "token.hpp"
 #include "tokentype.hpp"
 #include <initializer_list>
@@ -15,21 +16,25 @@ public:
   std::string message{};
 };
 
-template <typename T> class Parser {
+class Parser {
 public:
   Parser(const std::vector<Token> &tokens) : m_tokens{tokens} {}
-  std::unique_ptr<Expr<T>> parse();
+  std::vector<std::unique_ptr<Stmt>> parse();
 
 private:
-  std::unique_ptr<Expr<T>> expression();
-  std::unique_ptr<Expr<T>> comma();
-  std::unique_ptr<Expr<T>> ternary();
-  std::unique_ptr<Expr<T>> equality();
-  std::unique_ptr<Expr<T>> comparison();
-  std::unique_ptr<Expr<T>> term();
-  std::unique_ptr<Expr<T>> factor();
-  std::unique_ptr<Expr<T>> unary();
-  std::unique_ptr<Expr<T>> primary();
+  std::unique_ptr<Expr> expression();
+  std::unique_ptr<Expr> comma();
+  std::unique_ptr<Expr> ternary();
+  std::unique_ptr<Expr> equality();
+  std::unique_ptr<Expr> comparison();
+  std::unique_ptr<Expr> term();
+  std::unique_ptr<Expr> factor();
+  std::unique_ptr<Expr> unary();
+  std::unique_ptr<Expr> primary();
+
+  std::unique_ptr<Stmt> statement();
+  std::unique_ptr<Stmt> print_statement();
+  std::unique_ptr<Stmt> expression_statement();
 
   bool match(std::initializer_list<TokenType> types);
   Token consume(TokenType type, std::string_view message);
