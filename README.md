@@ -59,7 +59,6 @@ src/
   scanner.*       Tokenizes Lox source
   parser.*        Builds expression ASTs
   expression.*    AST node types and visitor interface
-  astprinter.*    Renders an AST for inspection
   token.*         Token representation
   lox.*           File and prompt entry points
   main.cpp        Executable entry point
