@@ -17,6 +17,7 @@ public:
   Object visit_ternary_expr(Ternary &expr) override;
   Object visit_variable_expr(Var &expr) override;
   Object visit_assign_expr(Assign &expr) override;
+  Object visit_logical_expr(Logical &expr) override;
 
   void visit_expression_stmt(Expression &stmt) override;
   void visit_print_stmt(Print &stmt) override;

@@ -11,6 +11,7 @@ class Unary;
 class Ternary;
 class Var;
 class Assign;
+class Logical;
 
 struct ExprVisitor {
   virtual Object visit_binary_expr(Binary &expr) = 0;
@@ -20,6 +21,7 @@ struct ExprVisitor {
   virtual Object visit_ternary_expr(Ternary &expr) = 0;
   virtual Object visit_variable_expr(Var &expr) = 0;
   virtual Object visit_assign_expr(Assign &expr) = 0;
+  virtual Object visit_logical_expr(Logical &expr) = 0;
 
   virtual ~ExprVisitor() = default;
 };
@@ -109,4 +111,16 @@ public:
 
   const Token m_name;
   const std::unique_ptr<Expr> m_value{};
+};
+
+class Logical : public Expr {
+public:
+  Logical(std::unique_ptr<Expr> left, Token &op, std::unique_ptr<Expr> right)
+      : m_left{std::move(left)}, m_operator{op}, m_right{std::move(right)} {}
+
+  Object accept(ExprVisitor &visitor) override;
+
+  std::unique_ptr<Expr> m_left{};
+  Token m_operator;
+  std::unique_ptr<Expr> m_right{};
 };

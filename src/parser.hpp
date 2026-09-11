@@ -26,6 +26,9 @@ private:
   std::unique_ptr<Expr> comma();
   std::unique_ptr<Expr> assignment();
   std::unique_ptr<Expr> ternary();
+  std::unique_ptr<Expr> orexp();
+  std::unique_ptr<Expr> andexp();
+
   std::unique_ptr<Expr> equality();
   std::unique_ptr<Expr> comparison();
   std::unique_ptr<Expr> term();

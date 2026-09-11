@@ -28,3 +28,7 @@ Object Var::accept(ExprVisitor &visitor) {
 Object Assign::accept(ExprVisitor &visitor) {
   return visitor.visit_assign_expr(*this);
 }
+
+Object Logical::accept(ExprVisitor &visitor) {
+  return visitor.visit_logical_expr(*this);
+}

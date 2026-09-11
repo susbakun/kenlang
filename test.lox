@@ -1,3 +1,2 @@
-var a = false;
-if (a == true) print a; else a = false;
-print a;
+print "hi" or 2; // "hi".
+print nil or "yes"; // "yes"

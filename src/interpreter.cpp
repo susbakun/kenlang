@@ -129,6 +129,20 @@ Object Interpreter::visit_assign_expr(Assign &expr) {
   return value;
 }
 
+Object Interpreter::visit_logical_expr(Logical &expr) {
+  auto left{evaluate(*expr.m_left)};
+
+  if (expr.m_operator.m_type == OR) {
+    if (is_truthy(left))
+      return left;
+  } else if (expr.m_operator.m_type == AND) {
+    if (!is_truthy(left))
+      return left;
+  }
+
+  return evaluate(*expr.m_right);
+}
+
 void Interpreter::visit_expression_stmt(Expression &stmt) {
   evaluate(*stmt.m_expression);
 }

@@ -42,17 +42,41 @@ std::unique_ptr<Expr> Parser::assignment() {
 }
 
 std::unique_ptr<Expr> Parser::ternary() {
-  auto expr{equality()};
+  auto expr{orexp()};
 
   if (match({QUESTION_MARK})) {
     auto left_operator{previous()};
-    auto mid{equality()};
+    auto mid{orexp()};
     auto right_operator{consume(COLON, "Unexped token")};
     auto right{ternary()};
 
     expr = std::make_unique<Ternary>(std::move(expr), left_operator,
                                      std::move(mid), right_operator,
                                      std::move(right));
+  }
+
+  return expr;
+}
+
+std::unique_ptr<Expr> Parser::orexp() {
+  auto expr{andexp()};
+
+  while (match({OR})) {
+    auto op{previous()};
+    auto right{andexp()};
+    expr = std::make_unique<Logical>(std::move(expr), op, std::move(right));
+  }
+
+  return expr;
+}
+
+std::unique_ptr<Expr> Parser::andexp() {
+  auto expr{equality()};
+
+  while (match({AND})) {
+    auto op{previous()};
+    auto right{equality()};
+    expr = std::make_unique<Logical>(std::move(expr), op, std::move(right));
   }
 
   return expr;
