@@ -6,10 +6,12 @@
 
 class Expression;
 class Print;
+class Variable;
 
 struct StmtVisitor {
   virtual void visit_expression_stmt(const Expression &stmt) const = 0;
   virtual void visit_print_stmt(const Print &stmt) const = 0;
+  virtual void visit_var_stmt(const Variable &stmt) const = 0;
 
   virtual ~StmtVisitor() = default;
 };
@@ -51,10 +53,12 @@ public:
   const std::unique_ptr<Expr> m_expression{};
 };
 
-class Var : public Stmt {
+class Variable : public Stmt {
 public:
-  Var(const Token &name, std::unique_ptr<Expr> initilizer)
+  Variable(const Token &name, std::unique_ptr<Expr> initilizer)
       : m_name{name}, m_initilizer{std::move(initilizer)} {}
+
+  void accept(const StmtVisitor &visitor) const override;
 
   const Token m_name;
   const std::unique_ptr<Expr> m_initilizer{};

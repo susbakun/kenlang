@@ -11,4 +11,5 @@ add_executable(${PROJECT_NAME} src/main.cpp src/token.cpp
   src/expression.cpp src/parser.cpp
   src/interpreter.cpp
   src/statement.cpp
+  src/environment.cpp
   )

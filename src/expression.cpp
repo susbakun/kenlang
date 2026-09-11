@@ -20,3 +20,7 @@ Object Unary::accept(const ExprVisitor &visitor) const {
 Object Ternary::accept(const ExprVisitor &visitor) const {
   return visitor.visit_ternary_expr(*this);
 }
+
+Object Var::accept(const ExprVisitor &visitor) const {
+  return visitor.visit_variable_expr(*this)
+}

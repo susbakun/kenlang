@@ -115,6 +115,10 @@ std::unique_ptr<Expr> Parser::primary() {
     return std::make_unique<Literal>(previous().m_literal);
   }
 
+  if (match({IDENTIFIER})) {
+    return std::make_unique<Var>(previous());
+  }
+
   if (match({LEFT_PAREN})) {
     auto expr{expression()};
     consume(RIGHT_PAREN, "Expect ')' after expression.");
@@ -122,6 +126,30 @@ std::unique_ptr<Expr> Parser::primary() {
   }
 
   throw error(peek(), "unexpected token");
+}
+
+std::unique_ptr<Stmt> Parser::declration() {
+  try {
+    if (match({VAR}))
+      return var_declration();
+
+    return statement();
+
+  } catch (ParseError &error) {
+    synchronize();
+    return nullptr;
+  }
+}
+
+std::unique_ptr<Stmt> Parser::var_declration() {
+  auto name{consume(IDENTIFIER, "Expect variable name")};
+
+  std::unique_ptr<Expr> initilizer{nullptr};
+  if (match({EQUAL}))
+    initilizer = expression();
+
+  consume(SEMICOLON, "Expect ';' after variable declration.");
+  return std::make_unique<Variable>(name, std::move(initilizer));
 }
 
 std::unique_ptr<Stmt> Parser::statement() {
@@ -210,7 +238,7 @@ std::vector<std::unique_ptr<Stmt>> Parser::parse() {
   std::vector<std::unique_ptr<Stmt>> statements{};
 
   while (!is_at_end())
-    statements.push_back(statement());
+    statements.push_back(declration());
 
   return statements;
 }

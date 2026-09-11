@@ -32,6 +32,8 @@ private:
   std::unique_ptr<Expr> unary();
   std::unique_ptr<Expr> primary();
 
+  std::unique_ptr<Stmt> declration();
+  std::unique_ptr<Stmt> var_declration();
   std::unique_ptr<Stmt> statement();
   std::unique_ptr<Stmt> print_statement();
   std::unique_ptr<Stmt> expression_statement();

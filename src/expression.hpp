@@ -9,6 +9,7 @@ class Grouping;
 class Literal;
 class Unary;
 class Ternary;
+class Var;
 
 struct ExprVisitor {
   virtual Object visit_binary_expr(const Binary &expr) const = 0;
@@ -16,6 +17,7 @@ struct ExprVisitor {
   virtual Object visit_literal_expr(const Literal &expr) const = 0;
   virtual Object visit_unary_expr(const Unary &expr) const = 0;
   virtual Object visit_ternary_expr(const Ternary &expr) const = 0;
+  virtual Object visit_variable_expr(const Var &expr) const = 0;
 
   virtual ~ExprVisitor() = default;
 };
@@ -85,4 +87,13 @@ public:
   const std::unique_ptr<Expr> m_mid;
   const Token m_right_operator;
   const std::unique_ptr<Expr> m_right;
+};
+
+class Var : public Expr {
+public:
+  Var(const Token &name) : m_name{name} {}
+
+  Object accept(const ExprVisitor &visitor) const override;
+
+  const Token m_name;
 };
