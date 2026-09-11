@@ -1,4 +1,5 @@
 #include "interpreter.hpp"
+#include "environment.hpp"
 #include "expression.hpp"
 #include "literal.hpp"
 #include "lox.hpp"
@@ -9,19 +10,16 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <type_traits>
 #include <variant>
 #include <vector>
 
-Object Interpreter::visit_literal_expr(const Literal &expr) const {
-  return expr.m_value;
-}
+Object Interpreter::visit_literal_expr(Literal &expr) { return expr.m_value; }
 
-Object Interpreter::visit_grouping_expr(const Grouping &expr) const {
+Object Interpreter::visit_grouping_expr(Grouping &expr) {
   return evaluate(*expr.m_expression);
 }
 
-Object Interpreter::visit_unary_expr(const Unary &expr) const {
+Object Interpreter::visit_unary_expr(Unary &expr) {
   auto right{evaluate(*expr.m_right)};
 
   switch (expr.m_operator.m_type) {
@@ -36,7 +34,7 @@ Object Interpreter::visit_unary_expr(const Unary &expr) const {
   }
 }
 
-Object Interpreter::visit_binary_expr(const Binary &expr) const {
+Object Interpreter::visit_binary_expr(Binary &expr) {
   auto left{evaluate(*expr.m_left)};
   auto right{evaluate(*expr.m_right)};
 
@@ -102,7 +100,7 @@ Object Interpreter::visit_binary_expr(const Binary &expr) const {
   }
 }
 
-Object Interpreter::visit_ternary_expr(const Ternary &expr) const {
+Object Interpreter::visit_ternary_expr(Ternary &expr) {
   auto left{evaluate(*expr.m_left)};
   auto mid{evaluate(*expr.m_mid)};
   auto right{evaluate(*expr.m_right)};
@@ -121,15 +119,21 @@ Object Interpreter::visit_ternary_expr(const Ternary &expr) const {
   }
 }
 
-Object Interpreter::visit_variable_expr(const Var &expr) const {
+Object Interpreter::visit_variable_expr(Var &expr) {
   return m_environment.get(expr.m_name);
 }
 
-void Interpreter::visit_expression_stmt(const Expression &stmt) const {
+Object Interpreter::visit_assign_expr(Assign &expr) {
+  auto value{evaluate(*expr.m_value)};
+  m_environment.assign(expr.m_name, value);
+  return value;
+}
+
+void Interpreter::visit_expression_stmt(Expression &stmt) {
   evaluate(*stmt.m_expression);
 }
 
-void Interpreter::visit_print_stmt(const Print &stmt) const {
+void Interpreter::visit_print_stmt(Print &stmt) {
   auto value{evaluate(*stmt.m_expression)};
   std::cout << literal_to_string(value) << "\n";
 }
@@ -143,9 +147,11 @@ void Interpreter::visit_var_stmt(Variable &stmt) {
   m_environment.define(stmt.m_name.m_lexeme, value);
 }
 
-Object Interpreter::evaluate(const Expr &expr) const {
-  return expr.accept(*this);
+void Interpreter::visit_block_stmt(Block &stmt) {
+  execute_block(stmt.m_statements, Environment{m_environment});
 }
+
+Object Interpreter::evaluate(Expr &expr) { return expr.accept(*this); }
 
 bool Interpreter::is_truthy(const Object &obj) const {
   if (std::holds_alternative<std::monostate>(obj))
@@ -187,7 +193,7 @@ void Interpreter::check_number_operands(const Token &op, const Object &operand1,
 void Interpreter::check_sametype_operands(const Token &op,
                                           const Object &operand1,
                                           const Object &operand2) const {
-  if (std::is_same_v<decltype(operand1), decltype(operand2)>)
+  if (operand1.index() == operand2.index())
     return;
 
   throw RuntimeError{op, "Operands must be of the same type"};
@@ -213,3 +219,20 @@ void Interpreter::interpret(
 }
 
 void Interpreter::execute(Stmt &stmt) { stmt.accept(*this); }
+
+void Interpreter::execute_block(
+    const std::vector<std::unique_ptr<Stmt>> &statements,
+    Environment &&environment) {
+  Environment previous{m_environment};
+
+  try {
+    m_environment = environment;
+    for (const auto &statement : statements) {
+      execute(*statement);
+    }
+  } catch (RuntimeError &error) {
+    Lox::runtime_error(error);
+  }
+
+  m_environment = previous;
+}

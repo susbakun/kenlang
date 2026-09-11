@@ -1,5 +1,9 @@
 #include "statement.hpp"
 
+void Block::accept(StmtVisitor &visitor) {
+  return visitor.visit_block_stmt(*this);
+}
+
 void Expression::accept(StmtVisitor &visitor) {
   return visitor.visit_expression_stmt(*this);
 }

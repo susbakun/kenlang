@@ -7,11 +7,13 @@
 class Expression;
 class Print;
 class Variable;
+class Block;
 
 struct StmtVisitor {
-  virtual void visit_expression_stmt(const Expression &stmt) const = 0;
-  virtual void visit_print_stmt(const Print &stmt) const = 0;
+  virtual void visit_expression_stmt(Expression &stmt) = 0;
+  virtual void visit_print_stmt(Print &stmt) = 0;
   virtual void visit_var_stmt(Variable &stmt) = 0;
+  virtual void visit_block_stmt(Block &stmt) = 0;
 
   virtual ~StmtVisitor() = default;
 };
@@ -25,7 +27,7 @@ public:
 
 class Block : public Stmt {
 public:
-  Block(std::vector<std::unique_ptr<Stmt>> &statements)
+  Block(std::vector<std::unique_ptr<Stmt>> &&statements)
       : m_statements{std::move(statements)} {}
 
   void accept(StmtVisitor &visitor) override;

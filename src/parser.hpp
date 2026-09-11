@@ -24,6 +24,7 @@ public:
 private:
   std::unique_ptr<Expr> expression();
   std::unique_ptr<Expr> comma();
+  std::unique_ptr<Expr> assignment();
   std::unique_ptr<Expr> ternary();
   std::unique_ptr<Expr> equality();
   std::unique_ptr<Expr> comparison();
@@ -36,6 +37,7 @@ private:
   std::unique_ptr<Stmt> var_declration();
   std::unique_ptr<Stmt> statement();
   std::unique_ptr<Stmt> print_statement();
+  std::vector<std::unique_ptr<Stmt>> block();
   std::unique_ptr<Stmt> expression_statement();
 
   bool match(std::initializer_list<TokenType> types);

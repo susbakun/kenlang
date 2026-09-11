@@ -11,13 +11,31 @@
 std::unique_ptr<Expr> Parser::expression() { return comma(); }
 
 std::unique_ptr<Expr> Parser::comma() {
-  auto expr{ternary()};
+  auto expr{assignment()};
 
   while (match({COMMA})) {
     auto op{previous()};
-    auto right{ternary()};
+    auto right{assignment()};
 
     expr = std::make_unique<Binary>(std::move(expr), op, std::move(right));
+  }
+
+  return expr;
+}
+
+std::unique_ptr<Expr> Parser::assignment() {
+  auto expr{ternary()};
+
+  if (match({EQUAL})) {
+    auto equals{previous()};
+    auto value{assignment()};
+
+    if (typeid(*expr) == typeid(Var)) {
+      auto name{dynamic_cast<Var &>(*expr).m_name};
+      return std::make_unique<Assign>(name, std::move(value));
+    }
+
+    error(equals, "Invalid assignment target.");
   }
 
   return expr;
@@ -155,6 +173,8 @@ std::unique_ptr<Stmt> Parser::var_declration() {
 std::unique_ptr<Stmt> Parser::statement() {
   if (match({PRINT}))
     return print_statement();
+  if (match({LEFT_BRACE}))
+    return std::make_unique<Block>(block());
   return expression_statement();
 }
 
@@ -162,6 +182,17 @@ std::unique_ptr<Stmt> Parser::print_statement() {
   auto value{expression()};
   consume(SEMICOLON, "Expected ; after a statement");
   return std::make_unique<Print>(std::move(value));
+}
+
+std::vector<std::unique_ptr<Stmt>> Parser::block() {
+  std::vector<std::unique_ptr<Stmt>> statements{};
+
+  while (!check(RIGHT_BRACE) && !is_at_end()) {
+    statements.push_back(declration());
+  }
+
+  consume(RIGHT_BRACE, "Expect '}' after block");
+  return statements;
 }
 
 std::unique_ptr<Stmt> Parser::expression_statement() {

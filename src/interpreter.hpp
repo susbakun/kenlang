@@ -5,27 +5,33 @@
 #include "literal.hpp"
 #include "statement.hpp"
 #include "token.hpp"
+#include <memory>
+#include <vector>
 
 class Interpreter : public ExprVisitor, StmtVisitor {
 public:
-  Object visit_literal_expr(const Literal &expr) const override;
-  Object visit_grouping_expr(const Grouping &expr) const override;
-  Object visit_unary_expr(const Unary &expr) const override;
-  Object visit_binary_expr(const Binary &expr) const override;
-  Object visit_ternary_expr(const Ternary &expr) const override;
-  Object visit_variable_expr(const Var &expr) const override;
+  Object visit_literal_expr(Literal &expr) override;
+  Object visit_grouping_expr(Grouping &expr) override;
+  Object visit_unary_expr(Unary &expr) override;
+  Object visit_binary_expr(Binary &expr) override;
+  Object visit_ternary_expr(Ternary &expr) override;
+  Object visit_variable_expr(Var &expr) override;
+  Object visit_assign_expr(Assign &expr) override;
 
-  void visit_expression_stmt(const Expression &stmt) const override;
-  void visit_print_stmt(const Print &stmt) const override;
+  void visit_expression_stmt(Expression &stmt) override;
+  void visit_print_stmt(Print &stmt) override;
   void visit_var_stmt(Variable &stmt) override;
+  void visit_block_stmt(Block &stmt) override;
 
   void interpret(const std::vector<std::unique_ptr<Stmt>> &statements);
 
 private:
   Environment m_environment{};
 
-  Object evaluate(const Expr &expr) const;
+  Object evaluate(Expr &expr);
   void execute(Stmt &stmt);
+  void execute_block(const std::vector<std::unique_ptr<Stmt>> &statements,
+                     Environment &&environment);
 
   bool is_truthy(const Object &obj) const;
   bool is_equal(const Object &a, const Object &b) const;
