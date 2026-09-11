@@ -1,5 +1,6 @@
 #pragma once
 
+#include "environment.hpp"
 #include "expression.hpp"
 #include "literal.hpp"
 #include "statement.hpp"
@@ -16,13 +17,15 @@ public:
 
   void visit_expression_stmt(const Expression &stmt) const override;
   void visit_print_stmt(const Print &stmt) const override;
-  void visit_var_stmt(const Variable &stmt) const override;
+  void visit_var_stmt(Variable &stmt) override;
 
-  void interpret(const std::vector<std::unique_ptr<Stmt>> &statements) const;
+  void interpret(const std::vector<std::unique_ptr<Stmt>> &statements);
 
 private:
+  Environment m_environment{};
+
   Object evaluate(const Expr &expr) const;
-  void execute(const Stmt &stmt) const;
+  void execute(Stmt &stmt);
 
   bool is_truthy(const Object &obj) const;
   bool is_equal(const Object &a, const Object &b) const;

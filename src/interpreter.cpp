@@ -121,6 +121,10 @@ Object Interpreter::visit_ternary_expr(const Ternary &expr) const {
   }
 }
 
+Object Interpreter::visit_variable_expr(const Var &expr) const {
+  return m_environment.get(expr.m_name);
+}
+
 void Interpreter::visit_expression_stmt(const Expression &stmt) const {
   evaluate(*stmt.m_expression);
 }
@@ -128,6 +132,15 @@ void Interpreter::visit_expression_stmt(const Expression &stmt) const {
 void Interpreter::visit_print_stmt(const Print &stmt) const {
   auto value{evaluate(*stmt.m_expression)};
   std::cout << literal_to_string(value) << "\n";
+}
+
+void Interpreter::visit_var_stmt(Variable &stmt) {
+  Object value{};
+  if (stmt.m_initilizer != nullptr) {
+    value = evaluate(*stmt.m_initilizer);
+  }
+
+  m_environment.define(stmt.m_name.m_lexeme, value);
 }
 
 Object Interpreter::evaluate(const Expr &expr) const {
@@ -189,7 +202,7 @@ void Interpreter::check_zero_division(const Token &op,
 }
 
 void Interpreter::interpret(
-    const std::vector<std::unique_ptr<Stmt>> &statements) const {
+    const std::vector<std::unique_ptr<Stmt>> &statements) {
   try {
     for (const auto &stmt : statements) {
       execute(*stmt);
@@ -199,4 +212,4 @@ void Interpreter::interpret(
   }
 }
 
-void Interpreter::execute(const Stmt &stmt) const { stmt.accept(*this); }
+void Interpreter::execute(Stmt &stmt) { stmt.accept(*this); }

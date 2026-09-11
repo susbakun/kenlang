@@ -9,9 +9,10 @@ class Environment {
 public:
   Environment() = default;
 
-  Object get(Token &name) const;
+  Object get(const Token &name) const;
 
-  void define(std::string &name, Object &value);
+  void define(const std::string &name, const Object &value);
 
+private:
   std::map<std::string, Object> m_map{};
 };

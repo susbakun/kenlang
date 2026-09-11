@@ -22,5 +22,5 @@ Object Ternary::accept(const ExprVisitor &visitor) const {
 }
 
 Object Var::accept(const ExprVisitor &visitor) const {
-  return visitor.visit_variable_expr(*this)
+  return visitor.visit_variable_expr(*this);
 }

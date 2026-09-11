@@ -4,14 +4,14 @@
 #include "token.hpp"
 #include <string>
 
-Object Environment::get(Token &name) const {
-  if (m_map.contains(name)) {
-    return m_map.at(name);
+Object Environment::get(const Token &name) const {
+  if (m_map.contains(name.m_lexeme)) {
+    return m_map.at(name.m_lexeme);
   }
 
   throw RuntimeError{name, "Undefined variable '" + name.m_lexeme + "'."};
 }
 
-void Environment::define(std::string &name, Object &value) {
+void Environment::define(const std::string &name, const Object &value) {
   m_map.insert({name, value});
 }
