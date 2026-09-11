@@ -15,3 +15,5 @@ void Print::accept(StmtVisitor &visitor) {
 void Variable::accept(StmtVisitor &visitor) {
   return visitor.visit_var_stmt(*this);
 }
+
+void If::accept(StmtVisitor &visitor) { return visitor.visit_if_stmt(*this); }

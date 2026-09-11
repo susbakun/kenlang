@@ -5,15 +5,17 @@
 #include <vector>
 
 class Expression;
+class Block;
 class Print;
 class Variable;
-class Block;
+class If;
 
 struct StmtVisitor {
   virtual void visit_expression_stmt(Expression &stmt) = 0;
   virtual void visit_print_stmt(Print &stmt) = 0;
   virtual void visit_var_stmt(Variable &stmt) = 0;
   virtual void visit_block_stmt(Block &stmt) = 0;
+  virtual void visit_if_stmt(If &stmt) = 0;
 
   virtual ~StmtVisitor() = default;
 };
@@ -64,4 +66,19 @@ public:
 
   const Token m_name;
   const std::unique_ptr<Expr> m_initilizer{};
+};
+
+class If : public Stmt {
+public:
+  If(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> then_branch,
+     std::unique_ptr<Stmt> else_branch)
+      : m_condition{std::move(condition)},
+        m_then_branch{std::move(then_branch)},
+        m_else_branc{std::move(else_branch)} {}
+
+  void accept(StmtVisitor &visitor) override;
+
+  std::unique_ptr<Expr> m_condition{};
+  std::unique_ptr<Stmt> m_then_branch{};
+  std::unique_ptr<Stmt> m_else_branc{};
 };

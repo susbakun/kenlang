@@ -171,11 +171,28 @@ std::unique_ptr<Stmt> Parser::var_declration() {
 }
 
 std::unique_ptr<Stmt> Parser::statement() {
+  if (match({IF}))
+    return if_statement();
   if (match({PRINT}))
     return print_statement();
   if (match({LEFT_BRACE}))
     return std::make_unique<Block>(block());
   return expression_statement();
+}
+
+std::unique_ptr<Stmt> Parser::if_statement() {
+  consume(LEFT_PAREN, "Expect '(' after 'if'.");
+  auto condition{expression()};
+  consume(RIGHT_PAREN, "Expect ')' after if condition.");
+  auto then_branch{statement()};
+  std::unique_ptr<Stmt> else_branch{nullptr};
+
+  if (match({ELSE})) {
+    else_branch = statement();
+  }
+
+  return std::make_unique<If>(std::move(condition), std::move(then_branch),
+                              std::move(else_branch));
 }
 
 std::unique_ptr<Stmt> Parser::print_statement() {
@@ -198,7 +215,7 @@ std::vector<std::unique_ptr<Stmt>> Parser::block() {
 std::unique_ptr<Stmt> Parser::expression_statement() {
   auto value{expression()};
   consume(SEMICOLON, "Expected ; after a statement");
-  return std::make_unique<Print>(std::move(value));
+  return std::make_unique<Expression>(std::move(value));
 }
 
 bool Parser::match(std::initializer_list<TokenType> types) {

@@ -1,8 +1,3 @@
-// No initializers.
-var a;
-var b;
-
-a = "assigned";
-print a; // OK, was assigned first.
-
-print b; // Error!
+var a = false;
+if (a == true) print a; else a = false;
+print a;

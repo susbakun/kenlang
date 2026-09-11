@@ -151,6 +151,14 @@ void Interpreter::visit_block_stmt(Block &stmt) {
   execute_block(stmt.m_statements, Environment{m_environment});
 }
 
+void Interpreter::visit_if_stmt(If &stmt) {
+  if (is_truthy(evaluate(*stmt.m_condition))) {
+    execute(*stmt.m_then_branch);
+  } else if (stmt.m_else_branc != nullptr) {
+    execute(*stmt.m_else_branc);
+  }
+}
+
 Object Interpreter::evaluate(Expr &expr) { return expr.accept(*this); }
 
 bool Interpreter::is_truthy(const Object &obj) const {

@@ -22,6 +22,7 @@ public:
   void visit_print_stmt(Print &stmt) override;
   void visit_var_stmt(Variable &stmt) override;
   void visit_block_stmt(Block &stmt) override;
+  void visit_if_stmt(If &stmt) override;
 
   void interpret(const std::vector<std::unique_ptr<Stmt>> &statements);
 
