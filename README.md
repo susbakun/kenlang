@@ -6,17 +6,20 @@ learning project and is being built incrementally alongside the book.
 
 ## Current progress
 
-The project currently implements the front end for Lox expressions:
+Kenlang can scan, parse, and interpret this subset of Lox:
 
-- Scans Lox source into tokens, including literals, keywords, line comments,
-  and nested block comments.
-- Parses literals, grouping, unary operators, arithmetic and comparison
-  operators, equality, comma expressions, and conditional (`?:`) expressions.
-- Represents expressions as an AST using the visitor pattern.
-- Prints the parsed AST and the scanned token stream.
+- Literal values: numbers, strings, booleans, and `nil`.
+- Grouping, unary operators, arithmetic, comparisons, equality, assignment,
+  comma expressions, and conditional (`?:`) expressions.
+- String concatenation with `+`.
+- Expression statements and `print` statements.
+- Variable declarations, lookup, and reassignment.
+- Block statements and block-local environments.
+- Line comments and nested block comments.
 
-It does not yet evaluate expressions or implement Lox statements, variables,
-functions, classes, or a runtime.
+Syntax and runtime errors are reported with their source line. The language is
+still in progress: control flow, functions, classes, and other later chapters
+from the book are not implemented yet.
 
 ## Requirements
 
@@ -48,21 +51,28 @@ Or start the prompt:
 ./build/kenlang
 ```
 
-Submit an empty line to leave the prompt. At this stage, each successful input
-prints its AST followed by its tokens. For example, `1 + 2 * 3` is printed as
-an AST that preserves multiplication's higher precedence.
+Submit an empty line to leave the prompt. Use `print` to display values:
+
+```lox
+var greeting = "Hello";
+print greeting + " from Lox";
+```
 
 ## Project layout
 
 ```text
 src/
   scanner.*       Tokenizes Lox source
-  parser.*        Builds expression ASTs
-  expression.*    AST node types and visitor interface
+  parser.*        Builds expression and statement ASTs
+  expression.*    Expression nodes and visitor interface
+  statement.*     Statement nodes and visitor interface
+  interpreter.*   Evaluates expressions and executes statements
+  environment.*   Stores variable bindings for an execution scope
+  runtime_error.* Represents interpreter errors with source-token context
   token.*         Token representation
   lox.*           File and prompt entry points
   main.cpp        Executable entry point
-test.lox          Small sample expression
+test.lox          Sample program
 ```
 
 ## Learning resource
