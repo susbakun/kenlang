@@ -120,12 +120,12 @@ Object Interpreter::visit_ternary_expr(Ternary &expr) {
 }
 
 Object Interpreter::visit_variable_expr(Var &expr) {
-  return m_environment.get(expr.m_name);
+  return m_environment->get(expr.m_name);
 }
 
 Object Interpreter::visit_assign_expr(Assign &expr) {
   auto value{evaluate(*expr.m_value)};
-  m_environment.assign(expr.m_name, value);
+  m_environment->assign(expr.m_name, value);
   return value;
 }
 
@@ -158,11 +158,12 @@ void Interpreter::visit_var_stmt(Variable &stmt) {
     value = evaluate(*stmt.m_initilizer);
   }
 
-  m_environment.define(stmt.m_name.m_lexeme, value);
+  m_environment->define(stmt.m_name.m_lexeme, value);
 }
 
 void Interpreter::visit_block_stmt(Block &stmt) {
-  execute_block(stmt.m_statements, Environment{m_environment});
+  execute_block(stmt.m_statements,
+                std::make_shared<Environment>(m_environment));
 }
 
 void Interpreter::visit_if_stmt(If &stmt) {
@@ -250,11 +251,11 @@ void Interpreter::execute(Stmt &stmt) { stmt.accept(*this); }
 
 void Interpreter::execute_block(
     const std::vector<std::unique_ptr<Stmt>> &statements,
-    Environment &&environment) {
-  Environment previous{m_environment};
+    std::shared_ptr<Environment> environment) {
+  auto previous{m_environment};
 
   try {
-    m_environment = environment;
+    m_environment = std::move(environment);
     for (const auto &statement : statements) {
       execute(*statement);
     }

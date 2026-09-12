@@ -26,8 +26,10 @@ void Environment::assign(const Token &name, const Object &value) {
     return;
   }
 
-  if (m_enclosing != nullptr)
+  if (m_enclosing != nullptr) {
     m_enclosing->assign(name, value);
+    return;
+  }
 
   throw RuntimeError{name, "Undefined variable '" + name.m_lexeme + "'."};
 }

@@ -10,6 +10,8 @@
 
 class Interpreter : public ExprVisitor, StmtVisitor {
 public:
+  Interpreter() : m_environment{std::make_shared<Environment>()} {}
+
   Object visit_literal_expr(Literal &expr) override;
   Object visit_grouping_expr(Grouping &expr) override;
   Object visit_unary_expr(Unary &expr) override;
@@ -29,12 +31,12 @@ public:
   void interpret(const std::vector<std::unique_ptr<Stmt>> &statements);
 
 private:
-  Environment m_environment{};
+  std::shared_ptr<Environment> m_environment;
 
   Object evaluate(Expr &expr);
   void execute(Stmt &stmt);
   void execute_block(const std::vector<std::unique_ptr<Stmt>> &statements,
-                     Environment &&environment);
+                     std::shared_ptr<Environment> environment);
 
   bool is_truthy(const Object &obj) const;
   bool is_equal(const Object &a, const Object &b) const;

@@ -39,6 +39,7 @@ private:
   std::unique_ptr<Stmt> declration();
   std::unique_ptr<Stmt> var_declration();
   std::unique_ptr<Stmt> statement();
+  std::unique_ptr<Stmt> for_statement();
   std::unique_ptr<Stmt> if_statement();
   std::unique_ptr<Stmt> print_statement();
   std::unique_ptr<Stmt> while_statement();
