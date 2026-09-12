@@ -59,4 +59,5 @@ private:
 
   std::vector<Token> m_tokens{};
   int m_current{};
+  int m_loop_depth{};
 };

@@ -30,8 +30,8 @@ std::unique_ptr<Expr> Parser::assignment() {
     auto equals{previous()};
     auto value{assignment()};
 
-    if (typeid(*expr) == typeid(Var)) {
-      auto name{dynamic_cast<Var &>(*expr).m_name};
+    if (auto var = dynamic_cast<Var *>(expr.get())) {
+      auto name{var->m_name};
       return std::make_unique<Assign>(name, std::move(value));
     }
 
@@ -236,7 +236,9 @@ std::unique_ptr<Stmt> Parser::for_statement() {
 
   consume(RIGHT_PAREN, "Expect ')' after for clause.");
 
+  m_loop_depth++;
   std::unique_ptr<Stmt> body{statement()};
+  m_loop_depth--;
 
   if (initilizer != nullptr) {
     auto new_body{std::vector<std::unique_ptr<Stmt>>()};
@@ -287,13 +289,20 @@ std::unique_ptr<Stmt> Parser::while_statement() {
   consume(LEFT_PAREN, "Expect '(' after 'while'.");
   auto condition{expression()};
   consume(RIGHT_PAREN, "Expect ')' after while condition.");
+  m_loop_depth++;
   auto body{statement()};
+  m_loop_depth--;
 
   return std::make_unique<While>(std::move(condition), std::move(body));
 }
 
 std::unique_ptr<Stmt> Parser::break_statement() {
   auto keyword{previous()};
+
+  // check if we're inside a loop
+  if (m_loop_depth == 0)
+    error(keyword, "Cannot use 'break' outside of a loop.");
+
   consume(SEMICOLON, "Expected ';' after break keyword.");
   return std::make_unique<Break>(keyword);
 }
