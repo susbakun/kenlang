@@ -10,6 +10,7 @@ class Print;
 class Variable;
 class If;
 class While;
+class Break;
 
 struct StmtVisitor {
   virtual void visit_expression_stmt(Expression &stmt) = 0;
@@ -18,6 +19,7 @@ struct StmtVisitor {
   virtual void visit_block_stmt(Block &stmt) = 0;
   virtual void visit_if_stmt(If &stmt) = 0;
   virtual void visit_while_stmt(While &stmt) = 0;
+  virtual void visit_break_stmt(Break &stmt) = 0;
 
   virtual ~StmtVisitor() = default;
 };
@@ -94,4 +96,13 @@ public:
 
   std::unique_ptr<Expr> m_condition{};
   std::unique_ptr<Stmt> m_body{};
+};
+
+class Break : public Stmt {
+public:
+  Break(Token &keyword) : m_keyword{keyword} {}
+
+  void accept(StmtVisitor &visitor) override;
+
+  Token m_keyword;
 };

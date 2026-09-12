@@ -21,3 +21,7 @@ void If::accept(StmtVisitor &visitor) { return visitor.visit_if_stmt(*this); }
 void While::accept(StmtVisitor &visitor) {
   return visitor.visit_while_stmt(*this);
 }
+
+void Break::accept(StmtVisitor &visitor) {
+  return visitor.visit_break_stmt(*this);
+}

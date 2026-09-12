@@ -1,4 +1,5 @@
 #include "interpreter.hpp"
+#include "break_exception.hpp"
 #include "environment.hpp"
 #include "expression.hpp"
 #include "literal.hpp"
@@ -176,9 +177,15 @@ void Interpreter::visit_if_stmt(If &stmt) {
 
 void Interpreter::visit_while_stmt(While &stmt) {
   while (is_truthy(evaluate(*stmt.m_condition))) {
-    execute(*stmt.m_body);
+    try {
+      execute(*stmt.m_body);
+    } catch (BreakException &error) {
+      break;
+    }
   }
 }
+
+void Interpreter::visit_break_stmt(Break &stmt) { throw BreakException{}; }
 
 Object Interpreter::evaluate(Expr &expr) { return expr.accept(*this); }
 

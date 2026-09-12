@@ -203,6 +203,8 @@ std::unique_ptr<Stmt> Parser::statement() {
     return print_statement();
   if (match({WHILE}))
     return while_statement();
+  if (match({BREAK}))
+    return break_statement();
   if (match({LEFT_BRACE}))
     return std::make_unique<Block>(block());
   return expression_statement();
@@ -290,6 +292,12 @@ std::unique_ptr<Stmt> Parser::while_statement() {
   return std::make_unique<While>(std::move(condition), std::move(body));
 }
 
+std::unique_ptr<Stmt> Parser::break_statement() {
+  auto keyword{previous()};
+  consume(SEMICOLON, "Expected ';' after break keyword.");
+  return std::make_unique<Break>(keyword);
+}
+
 std::vector<std::unique_ptr<Stmt>> Parser::block() {
   std::vector<std::unique_ptr<Stmt>> statements{};
 
@@ -361,6 +369,7 @@ void Parser::synchronize() {
     case PRINT:
     case RETURN:
       return;
+    default:
     }
 
     advance();
