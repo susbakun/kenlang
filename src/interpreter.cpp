@@ -173,6 +173,12 @@ void Interpreter::visit_if_stmt(If &stmt) {
   }
 }
 
+void Interpreter::visit_while_stmt(While &stmt) {
+  while (is_truthy(evaluate(*stmt.m_condition))) {
+    execute(*stmt.m_body);
+  }
+}
+
 Object Interpreter::evaluate(Expr &expr) { return expr.accept(*this); }
 
 bool Interpreter::is_truthy(const Object &obj) const {

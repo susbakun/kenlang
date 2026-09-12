@@ -24,6 +24,7 @@ public:
   void visit_var_stmt(Variable &stmt) override;
   void visit_block_stmt(Block &stmt) override;
   void visit_if_stmt(If &stmt) override;
+  void visit_while_stmt(While &stmt) override;
 
   void interpret(const std::vector<std::unique_ptr<Stmt>> &statements);
 

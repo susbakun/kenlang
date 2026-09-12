@@ -17,3 +17,7 @@ void Variable::accept(StmtVisitor &visitor) {
 }
 
 void If::accept(StmtVisitor &visitor) { return visitor.visit_if_stmt(*this); }
+
+void While::accept(StmtVisitor &visitor) {
+  return visitor.visit_while_stmt(*this);
+}

@@ -9,6 +9,7 @@ class Block;
 class Print;
 class Variable;
 class If;
+class While;
 
 struct StmtVisitor {
   virtual void visit_expression_stmt(Expression &stmt) = 0;
@@ -16,6 +17,7 @@ struct StmtVisitor {
   virtual void visit_var_stmt(Variable &stmt) = 0;
   virtual void visit_block_stmt(Block &stmt) = 0;
   virtual void visit_if_stmt(If &stmt) = 0;
+  virtual void visit_while_stmt(While &stmt) = 0;
 
   virtual ~StmtVisitor() = default;
 };
@@ -81,4 +83,15 @@ public:
   std::unique_ptr<Expr> m_condition{};
   std::unique_ptr<Stmt> m_then_branch{};
   std::unique_ptr<Stmt> m_else_branc{};
+};
+
+class While : public Stmt {
+public:
+  While(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body)
+      : m_condition{std::move(condition)}, m_body{std::move(body)} {}
+
+  void accept(StmtVisitor &visitor) override;
+
+  std::unique_ptr<Expr> m_condition{};
+  std::unique_ptr<Stmt> m_body{};
 };
