@@ -32,3 +32,7 @@ Object Assign::accept(ExprVisitor &visitor) {
 Object Logical::accept(ExprVisitor &visitor) {
   return visitor.visit_logical_expr(*this);
 }
+
+Object Call::accept(ExprVisitor &visitor) {
+  return visitor.visit_call_expr(*this);
+}

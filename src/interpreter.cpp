@@ -4,6 +4,7 @@
 #include "expression.hpp"
 #include "literal.hpp"
 #include "lox.hpp"
+#include "lox_callable.hpp"
 #include "runtime_error.hpp"
 #include "statement.hpp"
 #include "tokentype.hpp"
@@ -142,6 +143,30 @@ Object Interpreter::visit_logical_expr(Logical &expr) {
   }
 
   return evaluate(*expr.m_right);
+}
+
+Object Interpreter::visit_call_expr(Call &expr) {
+  Object callee{evaluate(*expr.m_callee)};
+
+  std::vector<Object> arguments{};
+  for (auto &argument : expr.m_arguments) {
+    arguments.push_back(std::move(evaluate(*argument)));
+  }
+
+  if (!std::holds_alternative<std::shared_ptr<LoxCallable>>(callee)) {
+    throw RuntimeError{expr.m_paren, "Can only call functions and classes"};
+  }
+
+  auto function{std::get<std::shared_ptr<LoxCallable>>(callee)};
+
+  if (arguments.size() != function->arity()) {
+    throw RuntimeError{expr.m_paren,
+                       "Expected " + std::to_string(function->arity()) +
+                           " arguments but got " +
+                           std::to_string(arguments.size()) + "."};
+  }
+
+  return function->call(*this, arguments);
 }
 
 void Interpreter::visit_expression_stmt(Expression &stmt) {

@@ -28,12 +28,13 @@ private:
   std::unique_ptr<Expr> ternary();
   std::unique_ptr<Expr> orexp();
   std::unique_ptr<Expr> andexp();
-
   std::unique_ptr<Expr> equality();
   std::unique_ptr<Expr> comparison();
   std::unique_ptr<Expr> term();
   std::unique_ptr<Expr> factor();
   std::unique_ptr<Expr> unary();
+  std::unique_ptr<Expr> call();
+  std::unique_ptr<Expr> finish_call(std::unique_ptr<Expr> callee);
   std::unique_ptr<Expr> primary();
 
   std::unique_ptr<Stmt> declration();

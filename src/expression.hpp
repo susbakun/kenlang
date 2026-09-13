@@ -3,6 +3,7 @@
 #include "literal.hpp"
 #include "token.hpp"
 #include <memory>
+#include <vector>
 
 class Binary;
 class Grouping;
@@ -12,6 +13,7 @@ class Ternary;
 class Var;
 class Assign;
 class Logical;
+class Call;
 
 struct ExprVisitor {
   virtual Object visit_binary_expr(Binary &expr) = 0;
@@ -22,6 +24,7 @@ struct ExprVisitor {
   virtual Object visit_variable_expr(Var &expr) = 0;
   virtual Object visit_assign_expr(Assign &expr) = 0;
   virtual Object visit_logical_expr(Logical &expr) = 0;
+  virtual Object visit_call_expr(Call &expr) = 0;
 
   virtual ~ExprVisitor() = default;
 };
@@ -123,4 +126,18 @@ public:
   std::unique_ptr<Expr> m_left{};
   Token m_operator;
   std::unique_ptr<Expr> m_right{};
+};
+
+class Call : public Expr {
+public:
+  Call(std::unique_ptr<Expr> callee, Token &paren,
+       std::vector<std::unique_ptr<Expr>> arguments)
+      : m_callee{std::move(callee)}, m_paren{paren},
+        m_arguments{std::move(arguments)} {}
+
+  Object accept(ExprVisitor &visitor) override;
+
+  std::unique_ptr<Expr> m_callee{};
+  Token m_paren;
+  std::vector<std::unique_ptr<Expr>> m_arguments{};
 };
