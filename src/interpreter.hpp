@@ -1,5 +1,6 @@
 #pragma once
 
+#include "clock.hpp"
 #include "environment.hpp"
 #include "expression.hpp"
 #include "literal.hpp"
@@ -10,7 +11,10 @@
 
 class Interpreter : public ExprVisitor, StmtVisitor {
 public:
-  Interpreter() : m_environment{std::make_shared<Environment>()} {}
+  Interpreter()
+      : m_globals{std::make_shared<Environment>()}, m_environment{m_globals} {
+    m_globals->define("clock", std::make_unique<Clock>());
+  }
 
   Object visit_literal_expr(Literal &expr) override;
   Object visit_grouping_expr(Grouping &expr) override;
@@ -34,6 +38,7 @@ public:
   void interpret(const std::vector<std::unique_ptr<Stmt>> &statements);
 
 private:
+  std::shared_ptr<Environment> m_globals;
   std::shared_ptr<Environment> m_environment;
 
   Object evaluate(Expr &expr);

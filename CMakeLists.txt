@@ -12,4 +12,5 @@ add_executable(${PROJECT_NAME} src/main.cpp src/token.cpp
   src/interpreter.cpp
   src/statement.cpp
   src/environment.cpp
+  src/clock.cpp
   )
