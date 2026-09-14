@@ -2,8 +2,11 @@
 #include "expression.hpp"
 #include "lox.hpp"
 #include "statement.hpp"
+#include "token.hpp"
 #include "tokentype.hpp"
 #include <memory>
+#include <string>
+#include <string_view>
 #include <sys/types.h>
 #include <variant>
 #include <vector>
@@ -204,6 +207,8 @@ std::unique_ptr<Expr> Parser::primary() {
 
 std::unique_ptr<Stmt> Parser::declration() {
   try {
+    if (match({FUN}))
+      return function("function");
     if (match({VAR}))
       return var_declration();
 
@@ -213,6 +218,28 @@ std::unique_ptr<Stmt> Parser::declration() {
     synchronize();
     return nullptr;
   }
+}
+
+std::unique_ptr<Stmt> Parser::function(std::string_view kind) {
+  auto name{consume(IDENTIFIER, "Expect " + std::string(kind) + " name.")};
+  consume(LEFT_PAREN, "Expect '(' after " + std::string(kind) + " name.");
+
+  std::vector<Token> parameters{};
+  if (!check(RIGHT_PAREN)) {
+    do {
+      if (parameters.size() >= 255) {
+        error(peek(), "Can't have more than 255 parameters.");
+      }
+      parameters.push_back(consume(IDENTIFIER, "Expect parameter name."));
+    } while (match({COMMA}));
+  }
+
+  consume(RIGHT_PAREN, "Expect ')' after parameters.");
+
+  consume(LEFT_BRACE, "Expect '{' before " + std::string(kind) + " body.");
+  auto body{block()};
+  return std::make_unique<Function>(name, std::move(parameters),
+                                    std::move(body));
 }
 
 std::unique_ptr<Stmt> Parser::var_declration() {

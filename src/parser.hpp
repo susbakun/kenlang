@@ -38,6 +38,7 @@ private:
   std::unique_ptr<Expr> primary();
 
   std::unique_ptr<Stmt> declration();
+  std::unique_ptr<Stmt> function(std::string_view kind);
   std::unique_ptr<Stmt> var_declration();
   std::unique_ptr<Stmt> statement();
   std::unique_ptr<Stmt> for_statement();

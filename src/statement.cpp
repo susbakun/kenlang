@@ -29,3 +29,7 @@ void Break::accept(StmtVisitor &visitor) {
 void Continue::accept(StmtVisitor &visitor) {
   return visitor.visit_continue_stmt(*this);
 }
+
+void Function::accept(StmtVisitor &visitor) {
+  return visitor.visit_function_stmt(*this);
+}

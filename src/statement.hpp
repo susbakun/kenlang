@@ -13,6 +13,7 @@ class If;
 class While;
 class Break;
 class Continue;
+class Function;
 
 struct StmtVisitor {
   virtual void visit_expression_stmt(Expression &stmt) = 0;
@@ -23,6 +24,7 @@ struct StmtVisitor {
   virtual void visit_while_stmt(While &stmt) = 0;
   virtual void visit_break_stmt(Break &stmt) = 0;
   virtual void visit_continue_stmt(Continue &stmt) = 0;
+  virtual void visit_function_stmt(Function &stmt) = 0;
 
   virtual ~StmtVisitor() = default;
 };
@@ -117,4 +119,18 @@ public:
   void accept(StmtVisitor &visitor) override;
 
   Token m_keyword;
+};
+
+class Function : public Stmt {
+public:
+  Function(Token &name, std::vector<Token> parameters,
+           std::vector<std::unique_ptr<Stmt>> body)
+      : m_name{name}, m_parameters{std::move(parameters)},
+        m_body{std::move(body)} {}
+
+  void accept(StmtVisitor &visitor) override;
+
+  Token m_name;
+  std::vector<Token> m_parameters{};
+  std::vector<std::unique_ptr<Stmt>> m_body{};
 };
