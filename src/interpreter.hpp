@@ -34,6 +34,7 @@ public:
   void visit_while_stmt(While &stmt) override;
   void visit_break_stmt(Break &stmt) override;
   void visit_continue_stmt(Continue &stmt) override;
+  void visit_function_stmt(Function &stmt) override;
 
   void interpret(const std::vector<std::unique_ptr<Stmt>> &statements);
 
