@@ -1,5 +1,6 @@
 #include "interpreter.hpp"
 #include "break_exception.hpp"
+#include "continue_exception.hpp"
 #include "environment.hpp"
 #include "expression.hpp"
 #include "literal.hpp"
@@ -206,11 +207,16 @@ void Interpreter::visit_while_stmt(While &stmt) {
       execute(*stmt.m_body);
     } catch (BreakException &error) {
       break;
+    } catch (ContinueException &error) {
+      continue;
     }
   }
 }
 
 void Interpreter::visit_break_stmt(Break &stmt) { throw BreakException{}; }
+void Interpreter::visit_continue_stmt(Continue &stmt) {
+  throw ContinueException{};
+};
 
 Object Interpreter::evaluate(Expr &expr) { return expr.accept(*this); }
 

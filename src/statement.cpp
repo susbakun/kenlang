@@ -25,3 +25,7 @@ void While::accept(StmtVisitor &visitor) {
 void Break::accept(StmtVisitor &visitor) {
   return visitor.visit_break_stmt(*this);
 }
+
+void Continue::accept(StmtVisitor &visitor) {
+  return visitor.visit_continue_stmt(*this);
+}

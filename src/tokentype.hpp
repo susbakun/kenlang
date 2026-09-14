@@ -53,6 +53,7 @@ enum TokenType {
   VAR,
   WHILE,
   BREAK,
+  CONTINUE,
 
   EOFILE
 
@@ -151,6 +152,8 @@ inline constexpr std::string_view get_tokentype_str(TokenType type) {
     return "WHILE";
   case BREAK:
     return "BREAK";
+  case CONTINUE:
+    return "CONTINUE";
 
   case EOFILE:
     return "EOFILE";

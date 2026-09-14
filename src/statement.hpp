@@ -1,6 +1,7 @@
 #pragma once
 
 #include "expression.hpp"
+#include "token.hpp"
 #include <memory>
 #include <vector>
 
@@ -11,6 +12,7 @@ class Variable;
 class If;
 class While;
 class Break;
+class Continue;
 
 struct StmtVisitor {
   virtual void visit_expression_stmt(Expression &stmt) = 0;
@@ -20,6 +22,7 @@ struct StmtVisitor {
   virtual void visit_if_stmt(If &stmt) = 0;
   virtual void visit_while_stmt(While &stmt) = 0;
   virtual void visit_break_stmt(Break &stmt) = 0;
+  virtual void visit_continue_stmt(Continue &stmt) = 0;
 
   virtual ~StmtVisitor() = default;
 };
@@ -101,6 +104,15 @@ public:
 class Break : public Stmt {
 public:
   Break(Token &keyword) : m_keyword{keyword} {}
+
+  void accept(StmtVisitor &visitor) override;
+
+  Token m_keyword;
+};
+
+class Continue : public Stmt {
+public:
+  Continue(Token &keyword) : m_keyword{keyword} {}
 
   void accept(StmtVisitor &visitor) override;
 
