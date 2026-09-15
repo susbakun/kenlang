@@ -6,6 +6,7 @@
 #include "literal.hpp"
 #include "lox.hpp"
 #include "lox_callable.hpp"
+#include "lox_function.hpp"
 #include "runtime_error.hpp"
 #include "statement.hpp"
 #include "tokentype.hpp"
@@ -214,9 +215,17 @@ void Interpreter::visit_while_stmt(While &stmt) {
 }
 
 void Interpreter::visit_break_stmt(Break &stmt) { throw BreakException{}; }
+
 void Interpreter::visit_continue_stmt(Continue &stmt) {
   throw ContinueException{};
 };
+
+void Interpreter::visit_function_stmt(Function &stmt) {
+  auto name{stmt.m_name.m_lexeme};
+  auto function{std::make_shared<Function>(std::move(stmt))};
+
+  m_environment->define(name, std::make_shared<LoxFunction>(function));
+}
 
 Object Interpreter::evaluate(Expr &expr) { return expr.accept(*this); }
 

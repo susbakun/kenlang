@@ -1,8 +1,5 @@
-var a = 1;
-while (a < 10) {
-    a = a + 1;
-    if (a == 2) continue;
-    print a;
+fun sayHi(first, last) {
+  print "Hi, " + first + " " + last + "!";
 }
 
-print clock();
+sayHi("Dear", "Reader");

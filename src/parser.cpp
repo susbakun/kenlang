@@ -171,7 +171,7 @@ std::unique_ptr<Expr> Parser::finish_call(std::unique_ptr<Expr> callee) {
       if (arguments.size() >= 255) {
         error(peek(), "Can't have more than 255 arguments.");
       }
-      arguments.emplace_back(expression());
+      arguments.push_back(assignment());
     } while (match({COMMA}));
   }
 

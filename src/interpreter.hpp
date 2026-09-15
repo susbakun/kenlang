@@ -16,6 +16,8 @@ public:
     m_globals->define("clock", std::make_unique<Clock>());
   }
 
+  std::shared_ptr<Environment> m_globals;
+
   Object visit_literal_expr(Literal &expr) override;
   Object visit_grouping_expr(Grouping &expr) override;
   Object visit_unary_expr(Unary &expr) override;
@@ -36,16 +38,16 @@ public:
   void visit_continue_stmt(Continue &stmt) override;
   void visit_function_stmt(Function &stmt) override;
 
+  void execute_block(const std::vector<std::unique_ptr<Stmt>> &statements,
+                     std::shared_ptr<Environment> environment);
+
   void interpret(const std::vector<std::unique_ptr<Stmt>> &statements);
 
 private:
-  std::shared_ptr<Environment> m_globals;
   std::shared_ptr<Environment> m_environment;
 
   Object evaluate(Expr &expr);
   void execute(Stmt &stmt);
-  void execute_block(const std::vector<std::unique_ptr<Stmt>> &statements,
-                     std::shared_ptr<Environment> environment);
 
   bool is_truthy(const Object &obj) const;
   bool is_equal(const Object &a, const Object &b) const;
