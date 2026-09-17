@@ -33,3 +33,7 @@ void Continue::accept(StmtVisitor &visitor) {
 void Function::accept(StmtVisitor &visitor) {
   return visitor.visit_function_stmt(*this);
 }
+
+void Return::accept(StmtVisitor &visitor) {
+  return visitor.visit_return_stmt(*this);
+}

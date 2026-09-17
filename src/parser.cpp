@@ -260,6 +260,8 @@ std::unique_ptr<Stmt> Parser::statement() {
     return if_statement();
   if (match({PRINT}))
     return print_statement();
+  if (match({RETURN}))
+    return return_statement();
   if (match({WHILE}))
     return while_statement();
   if (match({BREAK}))
@@ -342,6 +344,18 @@ std::unique_ptr<Stmt> Parser::print_statement() {
   auto value{expression()};
   consume(SEMICOLON, "Expected ; after a statement");
   return std::make_unique<Print>(std::move(value));
+}
+
+std::unique_ptr<Stmt> Parser::return_statement() {
+  auto keyword{previous()};
+  std::unique_ptr<Expr> value{nullptr};
+
+  if (!check(SEMICOLON)) {
+    value = expression();
+  }
+
+  consume(SEMICOLON, "Expected ';' after return statement");
+  return std::make_unique<Return>(keyword, std::move(value));
 }
 
 std::unique_ptr<Stmt> Parser::while_statement() {

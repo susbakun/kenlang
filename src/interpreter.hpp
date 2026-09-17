@@ -37,6 +37,7 @@ public:
   void visit_break_stmt(Break &stmt) override;
   void visit_continue_stmt(Continue &stmt) override;
   void visit_function_stmt(Function &stmt) override;
+  void visit_return_stmt(Return &stmt) override;
 
   void execute_block(const std::vector<std::unique_ptr<Stmt>> &statements,
                      std::shared_ptr<Environment> environment);

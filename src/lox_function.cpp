@@ -2,6 +2,7 @@
 #include "environment.hpp"
 #include "interpreter.hpp"
 #include "literal.hpp"
+#include "return_exception.hpp"
 #include <cstddef>
 #include <variant>
 
@@ -13,8 +14,12 @@ Object LoxFunction::call(Interpreter &interpreter,
     environment.define(m_declration->m_parameters[i].m_lexeme, arguments[i]);
   }
 
-  interpreter.execute_block(m_declration->m_body,
-                            std::make_shared<Environment>(environment));
+  try {
+    interpreter.execute_block(m_declration->m_body,
+                              std::make_shared<Environment>(environment));
+  } catch (ReturnException &exception) {
+    return exception.m_value;
+  }
 
   return std::monostate{};
 }

@@ -7,6 +7,7 @@
 #include "lox.hpp"
 #include "lox_callable.hpp"
 #include "lox_function.hpp"
+#include "return_exception.hpp"
 #include "runtime_error.hpp"
 #include "statement.hpp"
 #include "tokentype.hpp"
@@ -206,9 +207,9 @@ void Interpreter::visit_while_stmt(While &stmt) {
   while (is_truthy(evaluate(*stmt.m_condition))) {
     try {
       execute(*stmt.m_body);
-    } catch (BreakException &error) {
+    } catch (BreakException &exception) {
       break;
-    } catch (ContinueException &error) {
+    } catch (ContinueException &exception) {
       continue;
     }
   }
@@ -237,6 +238,14 @@ bool Interpreter::is_truthy(const Object &obj) const {
     return std::get<bool>(obj);
 
   return true;
+}
+
+void Interpreter::visit_return_stmt(Return &stmt) {
+  Object value{std::monostate{}};
+  if (stmt.m_value != nullptr)
+    value = evaluate(*stmt.m_value);
+
+  throw ReturnException{value};
 }
 
 bool Interpreter::is_equal(const Object &a, const Object &b) const {
@@ -308,7 +317,8 @@ void Interpreter::execute_block(
     }
   } catch (RuntimeError &error) {
     Lox::runtime_error(error);
+  } catch (...) {
+    m_environment = previous;
+    throw;
   }
-
-  m_environment = previous;
 }
