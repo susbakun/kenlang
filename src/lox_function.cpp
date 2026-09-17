@@ -8,7 +8,7 @@
 
 Object LoxFunction::call(Interpreter &interpreter,
                          std::vector<Object> &arguments) {
-  Environment environment{interpreter.m_globals};
+  Environment environment{m_closure};
 
   for (std::size_t i{}; i < m_declration->m_parameters.size(); i++) {
     environment.define(m_declration->m_parameters[i].m_lexeme, arguments[i]);
