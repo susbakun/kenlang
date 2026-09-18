@@ -1,10 +1,15 @@
 cmake_minimum_required(VERSION 3.15)
+
+set(CMAKE_CXX_COMPILER /opt/homebrew/opt/llvm/bin/clang++)
+
 project(kenlang)
 
-set(CMAKE_CXX_EXTENSIONS off)
-set(CMAKE_CXX_COMPILER clang++)
-set(CMAKE_CXX_STANDARD 26)
 
+set(CMAKE_CXX_EXTENSIONS off)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_BUILD_TYPE debug)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(${PROJECT_NAME} src/main.cpp src/token.cpp
   src/scanner.cpp src/lox.cpp
