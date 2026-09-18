@@ -11,20 +11,22 @@ Kenlang can scan, parse, and interpret this subset of Lox:
 - Literal values: numbers, strings, booleans, and `nil`.
 - Grouping, unary operators, arithmetic, comparisons, equality, assignment,
   comma expressions, and conditional (`?:`) expressions.
-- String concatenation with `+`.
-- Expression statements and `print` statements.
-- Variable declarations, lookup, and reassignment.
-- Block statements and block-local environments.
+- String concatenation with `+`, plus short-circuiting `and` and `or`.
+- Expression statements, `print`, and lexically scoped variables.
+- Blocks, `if`/`else`, `while`, `for`, and `break`.
+- Named functions, anonymous functions, calls, parameters, `return`, and
+  closures.
+- The built-in `clock()` function, which returns the Unix time in seconds.
 - Line comments and nested block comments.
 
 Syntax and runtime errors are reported with their source line. The language is
-still in progress: control flow, functions, classes, and other later chapters
-from the book are not implemented yet.
+still in progress: classes, inheritance, and other later chapters from the
+book are not implemented yet.
 
 ## Requirements
 
 - CMake 3.15 or newer
-- A C++26-capable compiler (the project currently uses Clang and `std::print`)
+- A C++23-capable Clang compiler (the CMake configuration uses Homebrew LLVM)
 
 ## Build
 
@@ -58,6 +60,19 @@ var greeting = "Hello";
 print greeting + " from Lox";
 ```
 
+Functions are values and may be passed as arguments:
+
+```lox
+fun twice(fn) {
+  fn(1);
+  fn(2);
+}
+
+twice(fun (value) {
+  print value;
+});
+```
+
 ## Project layout
 
 ```text
@@ -67,8 +82,12 @@ src/
   expression.*    Expression nodes and visitor interface
   statement.*     Statement nodes and visitor interface
   interpreter.*   Evaluates expressions and executes statements
-  environment.*   Stores variable bindings for an execution scope
+  environment.*   Chains lexical environments and variable bindings
+  lox_callable.*  Interface for callable Lox values
+  lox_function.*  Function calls and captured closures
+  clock.*         Built-in clock callable
   runtime_error.* Represents interpreter errors with source-token context
+  *_exception.hpp Implements non-local loop and return control flow
   token.*         Token representation
   lox.*           File and prompt entry points
   main.cpp        Executable entry point
