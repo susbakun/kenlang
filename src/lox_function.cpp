@@ -10,13 +10,22 @@ Object LoxFunction::call(Interpreter &interpreter,
                          std::vector<Object> &arguments) {
   Environment environment{m_closure};
 
-  for (std::size_t i{}; i < m_declration->m_parameters.size(); i++) {
-    environment.define(m_declration->m_parameters[i].m_lexeme, arguments[i]);
-  }
+  std::visit(
+      [&](const auto &declration) {
+        for (std::size_t i{}; i < declration->m_parameters.size(); i++) {
+          environment.define(declration->m_parameters[i].m_lexeme,
+                             arguments[i]);
+        }
+      },
+      m_declration);
 
   try {
-    interpreter.execute_block(m_declration->m_body,
-                              std::make_shared<Environment>(environment));
+    std::visit(
+        [&](const auto &declration) {
+          interpreter.execute_block(declration->m_body,
+                                    std::make_shared<Environment>(environment));
+        },
+        m_declration);
   } catch (ReturnException &exception) {
     return exception.m_value;
   }
@@ -24,4 +33,10 @@ Object LoxFunction::call(Interpreter &interpreter,
   return std::monostate{};
 }
 
-int LoxFunction::arity() const { return m_declration->m_parameters.size(); }
+int LoxFunction::arity() const {
+  return std::visit(
+      [&](const auto &declration) -> std::size_t {
+        return declration->m_parameters.size();
+      },
+      m_declration);
+};

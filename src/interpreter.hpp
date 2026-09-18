@@ -27,6 +27,7 @@ public:
   Object visit_assign_expr(Assign &expr) override;
   Object visit_logical_expr(Logical &expr) override;
   Object visit_call_expr(Call &expr) override;
+  Object visit_anonymous_func_expr(Anonymous &expr) override;
 
   void visit_expression_stmt(Expression &stmt) override;
   void visit_print_stmt(Print &stmt) override;

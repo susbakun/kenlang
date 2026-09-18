@@ -187,6 +187,8 @@ std::unique_ptr<Expr> Parser::primary() {
     return std::make_unique<Literal>(true);
   if (match({NIL}))
     return std::make_unique<Literal>(std::monostate{});
+  if (match({FUN}))
+    return anonymous_function();
 
   if (match({NUMBER, STRING})) {
     return std::make_unique<Literal>(previous().m_literal);
@@ -205,9 +207,30 @@ std::unique_ptr<Expr> Parser::primary() {
   throw error(peek(), "unexpected token");
 }
 
+std::unique_ptr<Expr> Parser::anonymous_function() {
+  consume(LEFT_PAREN, "Expect '(' after anonymous function.");
+
+  std::vector<Token> parameters{};
+  if (!check(RIGHT_PAREN)) {
+    do {
+      if (parameters.size() >= 255) {
+        error(peek(), "Can't have more than 255 parameters.");
+      }
+      parameters.push_back(consume(IDENTIFIER, "Expect parameter name."));
+    } while (match({COMMA}));
+  }
+
+  consume(RIGHT_PAREN, "Expect ')' after parameters.");
+
+  consume(LEFT_BRACE, "Expect '{' before anonymous function's body");
+  auto body{block()};
+  return std::make_unique<Anonymous>(std::move(parameters), std::move(body));
+}
+
 std::unique_ptr<Stmt> Parser::declration() {
   try {
-    if (match({FUN}))
+    // we need to exlude the anonymous functions here
+    if (check(FUN) && check_next(IDENTIFIER))
       return function("function");
     if (match({VAR}))
       return var_declration();
@@ -419,6 +442,16 @@ bool Parser::check(TokenType type) {
     return false;
 
   return (peek().m_type == type);
+}
+
+bool Parser::check_next(TokenType type) {
+  if (is_at_end())
+    return false;
+
+  // consume the previous token
+  advance();
+
+  return check(type);
 }
 
 Token Parser::advance() {

@@ -14,6 +14,9 @@ class Var;
 class Assign;
 class Logical;
 class Call;
+class Anonymous;
+
+class Stmt;
 
 struct ExprVisitor {
   virtual Object visit_binary_expr(Binary &expr) = 0;
@@ -25,21 +28,20 @@ struct ExprVisitor {
   virtual Object visit_assign_expr(Assign &expr) = 0;
   virtual Object visit_logical_expr(Logical &expr) = 0;
   virtual Object visit_call_expr(Call &expr) = 0;
+  virtual Object visit_anonymous_func_expr(Anonymous &expr) = 0;
 
   virtual ~ExprVisitor() = default;
 };
 
 class Expr {
 public:
-  virtual Object accept(ExprVisitor &) = 0;
-
   virtual ~Expr() = default;
+  virtual Object accept(ExprVisitor &visitor) = 0;
 };
 
 class Binary : public Expr {
 public:
-  Binary(std::unique_ptr<Expr> left, Token &op, std::unique_ptr<Expr> right)
-      : m_left{std::move(left)}, m_op{op}, m_right{std::move(right)} {}
+  Binary(std::unique_ptr<Expr> left, Token &op, std::unique_ptr<Expr> right);
 
   Object accept(ExprVisitor &visitor) override;
 
@@ -50,8 +52,7 @@ public:
 
 class Grouping : public Expr {
 public:
-  Grouping(std::unique_ptr<Expr> expression)
-      : m_expression{std::move(expression)} {}
+  explicit Grouping(std::unique_ptr<Expr> expression);
 
   Object accept(ExprVisitor &visitor) override;
 
@@ -60,7 +61,7 @@ public:
 
 class Literal : public Expr {
 public:
-  Literal(Object value) : m_value{value} {}
+  explicit Literal(Object value);
 
   Object accept(ExprVisitor &visitor) override;
 
@@ -69,8 +70,7 @@ public:
 
 class Unary : public Expr {
 public:
-  Unary(Token &op, std::unique_ptr<Expr> right)
-      : m_operator{op}, m_right{std::move(right)} {}
+  Unary(Token &op, std::unique_ptr<Expr> right);
 
   Object accept(ExprVisitor &visitor) override;
 
@@ -82,10 +82,7 @@ class Ternary : public Expr {
 public:
   Ternary(std::unique_ptr<Expr> left, Token &left_operator,
           std::unique_ptr<Expr> mid, Token &right_operator,
-          std::unique_ptr<Expr> right)
-      : m_left{std::move(left)}, m_left_operator{left_operator},
-        m_mid{std::move(mid)}, m_right_operator{right_operator},
-        m_right{std::move(right)} {}
+          std::unique_ptr<Expr> right);
 
   Object accept(ExprVisitor &visitor) override;
 
@@ -98,7 +95,7 @@ public:
 
 class Var : public Expr {
 public:
-  Var(const Token &name) : m_name{name} {}
+  explicit Var(const Token &name);
 
   Object accept(ExprVisitor &visitor) override;
 
@@ -107,8 +104,7 @@ public:
 
 class Assign : public Expr {
 public:
-  Assign(const Token &name, std::unique_ptr<Expr> value)
-      : m_name{name}, m_value{std::move(value)} {}
+  Assign(const Token &name, std::unique_ptr<Expr> value);
 
   Object accept(ExprVisitor &visitor) override;
 
@@ -118,8 +114,7 @@ public:
 
 class Logical : public Expr {
 public:
-  Logical(std::unique_ptr<Expr> left, Token &op, std::unique_ptr<Expr> right)
-      : m_left{std::move(left)}, m_operator{op}, m_right{std::move(right)} {}
+  Logical(std::unique_ptr<Expr> left, Token &op, std::unique_ptr<Expr> right);
 
   Object accept(ExprVisitor &visitor) override;
 
@@ -131,13 +126,26 @@ public:
 class Call : public Expr {
 public:
   Call(std::unique_ptr<Expr> callee, Token &paren,
-       std::vector<std::unique_ptr<Expr>> arguments)
-      : m_callee{std::move(callee)}, m_paren{paren},
-        m_arguments{std::move(arguments)} {}
+       std::vector<std::unique_ptr<Expr>> arguments);
 
   Object accept(ExprVisitor &visitor) override;
 
   std::unique_ptr<Expr> m_callee{};
   Token m_paren;
   std::vector<std::unique_ptr<Expr>> m_arguments{};
+};
+
+class Anonymous : public Expr {
+public:
+  Anonymous(std::vector<Token> parameters,
+            std::vector<std::unique_ptr<Stmt>> body);
+
+  Anonymous(Anonymous &&) noexcept;
+
+  ~Anonymous();
+
+  Object accept(ExprVisitor &visitor) override;
+
+  std::vector<Token> m_parameters{};
+  std::vector<std::unique_ptr<Stmt>> m_body{};
 };

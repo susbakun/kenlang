@@ -36,6 +36,7 @@ private:
   std::unique_ptr<Expr> call();
   std::unique_ptr<Expr> finish_call(std::unique_ptr<Expr> callee);
   std::unique_ptr<Expr> primary();
+  std::unique_ptr<Expr> anonymous_function();
 
   std::unique_ptr<Stmt> declration();
   std::unique_ptr<Stmt> function(std::string_view kind);
@@ -53,6 +54,7 @@ private:
   bool match(std::initializer_list<TokenType> types);
   Token consume(TokenType type, std::string_view message);
   bool check(TokenType type);
+  bool check_next(TokenType type);
   Token advance();
   Token previous();
   ParseError error(const Token &token, std::string_view message);

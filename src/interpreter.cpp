@@ -172,6 +172,12 @@ Object Interpreter::visit_call_expr(Call &expr) {
   return function->call(*this, arguments);
 }
 
+Object Interpreter::visit_anonymous_func_expr(Anonymous &expr) {
+  auto ann{std::make_shared<Anonymous>(std::move(expr))};
+
+  return std::make_shared<LoxFunction>(ann, m_environment);
+}
+
 void Interpreter::visit_expression_stmt(Expression &stmt) {
   evaluate(*stmt.m_expression);
 }
@@ -322,4 +328,7 @@ void Interpreter::execute_block(
     m_environment = previous;
     throw;
   }
+
+  // because cpp doesn't have fucking finally
+  m_environment = previous;
 }
