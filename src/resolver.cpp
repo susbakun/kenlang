@@ -73,7 +73,7 @@ Object Resolver::visit_unary_expr(Unary &expr) {
 }
 
 Object Resolver::visit_anonymous_func_expr(Anonymous &expr) {
-  resolve_function(expr);
+  resolve_function(expr, FunctionType::FUNCTION);
 
   return std::monostate{};
 }
@@ -96,7 +96,7 @@ void Resolver::visit_function_stmt(Function &stmt) {
   declare(stmt.m_name);
   define(stmt.m_name);
 
-  resolve_function(stmt);
+  resolve_function(stmt, FunctionType::FUNCTION);
 }
 
 void Resolver::visit_break_stmt(Break &stmt) { return; }
@@ -117,6 +117,10 @@ void Resolver::visit_if_stmt(If &stmt) {
 void Resolver::visit_print_stmt(Print &stmt) { resolve(*stmt.m_expression); }
 
 void Resolver::visit_return_stmt(Return &stmt) {
+  if (m_current_function == FunctionType::NONE) {
+    Lox::error(stmt.m_keyword, "Can't return from top-level code.");
+  }
+
   if (stmt.m_value != nullptr)
     resolve(*stmt.m_value);
 }
@@ -148,6 +152,10 @@ void Resolver::declare(const Token &token) {
 
   auto &scope{m_scopes.top()};
 
+  if (scope.contains(token.m_lexeme)) {
+    Lox::error(token, "Already a variable with this name in this scope.");
+  }
+
   scope.insert({token.m_lexeme, false});
 }
 
@@ -177,17 +185,11 @@ void Resolver::resolve_local(Expr &expr, const Token &name) {
   }
 }
 
-void Resolver::resolve_function(Function &function) {
-  begin_scope();
-  for (auto &param : function.m_parameters) {
-    declare(param);
-    define(param);
-  }
-  resolve(function.m_body);
-  end_scope();
-}
+template <typename T>
+void Resolver::resolve_function(T &function, const FunctionType type) {
+  auto enclosing_scope{m_current_function};
+  m_current_function = type;
 
-void Resolver::resolve_function(Anonymous &function) {
   begin_scope();
   for (auto &param : function.m_parameters) {
     declare(param);
@@ -195,4 +197,6 @@ void Resolver::resolve_function(Anonymous &function) {
   }
   resolve(function.m_body);
   end_scope();
+
+  m_current_function = enclosing_scope;
 }

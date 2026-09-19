@@ -11,6 +11,8 @@
 #include <unordered_map>
 #include <vector>
 
+enum class FunctionType { NONE, FUNCTION };
+
 class Resolver : public ExprVisitor, StmtVisitor {
 public:
   Resolver(Interpreter &interpreter) : m_interpreter{interpreter} {}
@@ -47,9 +49,11 @@ private:
   void declare(const Token &token);
   void define(const Token &token);
   void resolve_local(Expr &expr, const Token &name);
-  void resolve_function(Function &function);
-  void resolve_function(Anonymous &function);
+
+  template <typename T>
+  void resolve_function(T &function, const FunctionType type);
 
   Interpreter &m_interpreter;
   std::stack<std::unordered_map<std::string, bool>> m_scopes{};
+  FunctionType m_current_function{FunctionType::NONE};
 };

@@ -58,11 +58,16 @@ void Lox::run(std::string &source) {
   Parser parser{tokens};
   auto statements{parser.parse()};
 
+  // Stop if there was a parse error.
   if (had_error)
     return;
 
   Resolver resolver{interpreter};
   resolver.resolve(statements);
+
+  // Stop if there was a resolution error.
+  if (had_error)
+    return;
 
   interpreter.interpret(statements);
 }
