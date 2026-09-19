@@ -6,6 +6,7 @@
 #include "literal.hpp"
 #include "statement.hpp"
 #include "token.hpp"
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -40,6 +41,8 @@ public:
   void visit_function_stmt(Function &stmt) override;
   void visit_return_stmt(Return &stmt) override;
 
+  void resolve(Expr &expr, int depth);
+
   void execute_block(const std::vector<std::unique_ptr<Stmt>> &statements,
                      std::shared_ptr<Environment> environment);
 
@@ -47,6 +50,9 @@ public:
 
 private:
   std::shared_ptr<Environment> m_environment;
+  std::map<Expr *, int> m_locals{};
+
+  Object lookup_variable(const Token &name, Expr &expr);
 
   Object evaluate(Expr &expr);
   void execute(Stmt &stmt);

@@ -125,12 +125,19 @@ Object Interpreter::visit_ternary_expr(Ternary &expr) {
 }
 
 Object Interpreter::visit_variable_expr(Var &expr) {
-  return m_environment->get(expr.m_name);
+  return lookup_variable(expr.m_name, expr);
 }
 
 Object Interpreter::visit_assign_expr(Assign &expr) {
   auto value{evaluate(*expr.m_value)};
-  m_environment->assign(expr.m_name, value);
+
+  auto distance{m_locals.find(&expr)};
+  if (distance != m_locals.end()) {
+    m_environment->assign_at(distance->second, expr.m_name, value);
+  } else {
+    m_globals->assign(expr.m_name, value);
+  }
+
   return value;
 }
 
@@ -253,6 +260,20 @@ void Interpreter::visit_return_stmt(Return &stmt) {
     value = evaluate(*stmt.m_value);
 
   throw ReturnException{value};
+}
+
+void Interpreter::resolve(Expr &expr, int depth) {
+  m_locals.insert({&expr, depth});
+}
+
+Object Interpreter::lookup_variable(const Token &name, Expr &expr) {
+  auto distance{m_locals.find(&expr)};
+
+  if (distance != m_locals.end()) {
+    return m_environment->get_at(distance->second, name.m_lexeme);
+  } else {
+    return m_globals->get(name);
+  }
 }
 
 bool Interpreter::is_equal(const Object &a, const Object &b) const {

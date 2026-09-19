@@ -2,6 +2,8 @@
 #include "literal.hpp"
 #include "runtime_error.hpp"
 #include "token.hpp"
+#include <cstddef>
+#include <memory>
 #include <string>
 #include <variant>
 
@@ -20,6 +22,20 @@ Object Environment::get(const Token &name) const {
   throw RuntimeError{name, "Undefined variable '" + name.m_lexeme + "'."};
 }
 
+Object Environment::get_at(int distance, const std::string &name) {
+  return ancestor(distance)->m_map.at(name);
+}
+
+std::shared_ptr<Environment> Environment::ancestor(int distance) {
+  auto environment{std::make_shared<Environment>(*this)};
+
+  for (std::size_t i{}; i < distance; i++) {
+    environment = environment->m_enclosing;
+  }
+
+  return environment;
+}
+
 void Environment::assign(const Token &name, const Object &value) {
   if (m_map.contains(name.m_lexeme)) {
     m_map[name.m_lexeme] = value;
@@ -32,6 +48,10 @@ void Environment::assign(const Token &name, const Object &value) {
   }
 
   throw RuntimeError{name, "Undefined variable '" + name.m_lexeme + "'."};
+}
+
+void Environment::assign_at(int distance, const Token &name, Object &value) {
+  ancestor(distance)->assign(name, value);
 }
 
 void Environment::define(const std::string &name, const Object &value) {

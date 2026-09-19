@@ -227,13 +227,13 @@ std::unique_ptr<Expr> Parser::anonymous_function() {
   return std::make_unique<Anonymous>(std::move(parameters), std::move(body));
 }
 
-std::unique_ptr<Stmt> Parser::declration() {
+std::unique_ptr<Stmt> Parser::declaration() {
   try {
     // we need to exlude the anonymous functions here
     if (check(FUN) && check_next(IDENTIFIER))
       return function("function");
     if (match({VAR}))
-      return var_declration();
+      return var_declaration();
 
     return statement();
 
@@ -265,7 +265,7 @@ std::unique_ptr<Stmt> Parser::function(std::string_view kind) {
                                     std::move(body));
 }
 
-std::unique_ptr<Stmt> Parser::var_declration() {
+std::unique_ptr<Stmt> Parser::var_declaration() {
   auto name{consume(IDENTIFIER, "Expect variable name")};
 
   std::unique_ptr<Expr> initilizer{nullptr};
@@ -301,7 +301,7 @@ std::unique_ptr<Stmt> Parser::for_statement() {
   if (match({SEMICOLON})) {
     initilizer = nullptr;
   } else if (match({VAR})) {
-    initilizer = var_declration();
+    initilizer = var_declaration();
   } else {
     initilizer = expression_statement();
   }
@@ -407,7 +407,7 @@ std::vector<std::unique_ptr<Stmt>> Parser::block() {
   std::vector<std::unique_ptr<Stmt>> statements{};
 
   while (!check(RIGHT_BRACE) && !is_at_end()) {
-    statements.push_back(declration());
+    statements.push_back(declaration());
   }
 
   consume(RIGHT_BRACE, "Expect '}' after block");
@@ -499,7 +499,7 @@ std::vector<std::unique_ptr<Stmt>> Parser::parse() {
   std::vector<std::unique_ptr<Stmt>> statements{};
 
   while (!is_at_end())
-    statements.push_back(declration());
+    statements.push_back(declaration());
 
   return statements;
 }

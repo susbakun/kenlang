@@ -1,5 +1,6 @@
 #include "lox.hpp"
 #include "parser.hpp"
+#include "resolver.hpp"
 #include "scanner.hpp"
 #include "token.hpp"
 
@@ -59,6 +60,9 @@ void Lox::run(std::string &source) {
 
   if (had_error)
     return;
+
+  Resolver resolver{interpreter};
+  resolver.resolve(statements);
 
   interpreter.interpret(statements);
 }
