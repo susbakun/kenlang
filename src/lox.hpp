@@ -17,6 +17,10 @@ public:
   void runPrompt();
   void run(std::string &source);
 
+  static inline void warning(std::string_view warning) {
+    std::println("Warning: {}", warning);
+  }
+
   static inline void error(int line, std::string_view error) {
     report(line, "", error);
   };

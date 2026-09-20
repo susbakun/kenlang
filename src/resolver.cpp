@@ -10,7 +10,7 @@ Object Resolver::visit_variable_expr(Var &expr) {
   if (!m_scopes.empty()) {
     auto &scope{m_scopes.top()};
     auto it{scope.find(expr.m_name.m_lexeme)};
-    if (it != scope.end() && it->second == false) {
+    if (it != scope.end() && it->second.defined == false) {
       Lox::error(expr.m_name,
                  "Can't read local variable in its own initializer.");
     }
@@ -131,7 +131,7 @@ void Resolver::visit_while_stmt(While &stmt) {
 }
 
 void Resolver::begin_scope() {
-  m_scopes.push(std::unordered_map<std::string, bool>{});
+  m_scopes.push(std::unordered_map<std::string, VariableState>{});
 }
 
 void Resolver::resolve(const std::vector<std::unique_ptr<Stmt>> &statements) {
@@ -144,7 +144,17 @@ void Resolver::resolve(Stmt &stmt) { stmt.accept(*this); }
 
 void Resolver::resolve(Expr &expr) { expr.accept(*this); }
 
-void Resolver::end_scope() { m_scopes.pop(); }
+void Resolver::end_scope() {
+  auto &scope{m_scopes.top()};
+
+  for (const auto &item : scope) {
+    if (item.second.used == false) {
+      Lox::warning("Unused variable " + item.first);
+    }
+  }
+
+  m_scopes.pop();
+}
 
 void Resolver::declare(const Token &token) {
   if (m_scopes.empty())
@@ -156,7 +166,7 @@ void Resolver::declare(const Token &token) {
     Lox::error(token, "Already a variable with this name in this scope.");
   }
 
-  scope.insert({token.m_lexeme, false});
+  scope.insert({token.m_lexeme, {false, false}});
 }
 
 void Resolver::define(const Token &token) {
@@ -165,7 +175,7 @@ void Resolver::define(const Token &token) {
 
   auto &scope{m_scopes.top()};
 
-  scope[token.m_lexeme] = true;
+  scope[token.m_lexeme].defined = true;
 }
 
 void Resolver::resolve_local(Expr &expr, const Token &name) {
@@ -178,6 +188,7 @@ void Resolver::resolve_local(Expr &expr, const Token &name) {
   while (!scopes_copy.empty()) {
     if (scopes_copy.top().contains(name.m_lexeme)) {
       m_interpreter.resolve(expr, depth);
+      mark_as_used(name);
       return;
     }
     scopes_copy.pop();
@@ -199,4 +210,13 @@ void Resolver::resolve_function(T &function, const FunctionType type) {
   end_scope();
 
   m_current_function = enclosing_scope;
+}
+
+void Resolver::mark_as_used(const Token &name) {
+  auto &scope{m_scopes.top()};
+  auto pair{scope.find(name.m_lexeme)};
+
+  if (pair != scope.end()) {
+    pair->second.used = true;
+  }
 }

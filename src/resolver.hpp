@@ -13,6 +13,11 @@
 
 enum class FunctionType { NONE, FUNCTION };
 
+struct VariableState {
+  bool defined;
+  bool used;
+};
+
 class Resolver : public ExprVisitor, StmtVisitor {
 public:
   Resolver(Interpreter &interpreter) : m_interpreter{interpreter} {}
@@ -49,11 +54,12 @@ private:
   void declare(const Token &token);
   void define(const Token &token);
   void resolve_local(Expr &expr, const Token &name);
+  void mark_as_used(const Token &name);
 
   template <typename T>
   void resolve_function(T &function, const FunctionType type);
 
   Interpreter &m_interpreter;
-  std::stack<std::unordered_map<std::string, bool>> m_scopes{};
+  std::stack<std::unordered_map<std::string, VariableState>> m_scopes{};
   FunctionType m_current_function{FunctionType::NONE};
 };
