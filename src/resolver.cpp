@@ -149,7 +149,8 @@ void Resolver::end_scope() {
 
   for (const auto &item : scope) {
     if (item.second.used == false) {
-      Lox::warning("Unused variable " + item.first);
+      Lox::warning("Unused variable " + item.first + " defined in line " +
+                   std::to_string(item.second.line_defined));
     }
   }
 
@@ -166,7 +167,7 @@ void Resolver::declare(const Token &token) {
     Lox::error(token, "Already a variable with this name in this scope.");
   }
 
-  scope.insert({token.m_lexeme, {false, false}});
+  scope.insert({token.m_lexeme, {false, false, token.m_line}});
 }
 
 void Resolver::define(const Token &token) {

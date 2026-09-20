@@ -16,6 +16,7 @@ enum class FunctionType { NONE, FUNCTION };
 struct VariableState {
   bool defined;
   bool used;
+  int line_defined;
 };
 
 class Resolver : public ExprVisitor, StmtVisitor {
