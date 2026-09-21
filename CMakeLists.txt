@@ -16,4 +16,6 @@ add_executable(${PROJECT_NAME} src/main.cpp src/token.cpp
   src/clock.cpp
   src/lox_function.cpp
   src/resolver.cpp
+  src/lox_class.cpp
+  src/lox_instance.cpp
   )

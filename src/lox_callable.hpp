@@ -10,5 +10,6 @@ public:
   virtual ~LoxCallable() = default;
   virtual Object call(Interpreter &interpreter,
                       std::vector<Object> &arguments) = 0;
+
   virtual int arity() const = 0;
 };

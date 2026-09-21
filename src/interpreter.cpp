@@ -265,7 +265,7 @@ void Interpreter::visit_return_stmt(Return &stmt) {
 
 void Interpreter::visit_class_stmt(Class &stmt) {
   m_environment->define(stmt.m_name.m_lexeme, std::monostate{});
-  LoxClass klass{LoxClass{stmt.m_name.m_lexeme}};
+  auto klass{std::make_shared<LoxClass>(stmt.m_name.m_lexeme)};
   m_environment->assign(stmt.m_name, klass);
 }
 
