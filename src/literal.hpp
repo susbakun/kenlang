@@ -1,36 +1,14 @@
 #pragma once
 
 #include <memory>
-#include <sstream>
 #include <string>
 #include <variant>
 
 class LoxCallable;
 class LoxInstance;
 
-using Object = std::variant<std::monostate, double, std::string, bool,
-                            std::shared_ptr<LoxCallable>>;
+using Object =
+    std::variant<std::monostate, double, std::string, bool,
+                 std::shared_ptr<LoxCallable>, std::shared_ptr<LoxInstance>>;
 
-inline std::string literal_to_string(const Object &literal) {
-  return std::visit(
-      [](const auto &value) -> std::string {
-        using T = std::decay_t<decltype(value)>;
-
-        if constexpr (std::is_same_v<T, std::monostate>) {
-          return "nil";
-        } else if constexpr (std::is_same_v<T, std::string>) {
-          return value;
-        } else if constexpr (std::is_same_v<T, bool>) {
-          return value ? "true" : "false";
-        } else if constexpr (std::is_same_v<T, std::shared_ptr<LoxCallable>>) {
-          return "loxcallable";
-        } else if constexpr (std::is_same_v<T, double>) {
-          std::ostringstream out;
-          out << value;
-          return out.str();
-        } else {
-          std::to_string(value);
-        }
-      },
-      literal);
-}
+std::string literal_to_string(const Object &literal);

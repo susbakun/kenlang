@@ -78,6 +78,19 @@ Object Resolver::visit_anonymous_func_expr(Anonymous &expr) {
   return std::monostate{};
 }
 
+Object Resolver::visit_get_expr(Get &expr) {
+  resolve(*expr.m_obj);
+
+  return std::monostate{};
+}
+
+Object Resolver::visit_set_expr(Set &expr) {
+  resolve(*expr.m_obj);
+  resolve(*expr.m_value);
+
+  return std::monostate{};
+}
+
 void Resolver::visit_block_stmt(Block &stmt) {
   begin_scope();
   resolve(stmt.m_statements);

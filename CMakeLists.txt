@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(${PROJECT_NAME} src/main.cpp src/token.cpp
+  src/literal.cpp
   src/scanner.cpp src/lox.cpp
   src/expression.cpp src/parser.cpp
   src/interpreter.cpp

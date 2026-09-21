@@ -33,6 +33,8 @@ public:
   Object visit_logical_expr(Logical &expr) override;
   Object visit_unary_expr(Unary &expr) override;
   Object visit_anonymous_func_expr(Anonymous &expr) override;
+  Object visit_get_expr(Get &expr) override;
+  Object visit_set_expr(Set &expr) override;
 
   void visit_block_stmt(Block &stmt) override;
   void visit_var_stmt(Variable &stmt) override;

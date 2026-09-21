@@ -5,7 +5,8 @@
 
 Object LoxClass::call(Interpreter &interpreter,
                       std::vector<Object> &arguments) {
-  LoxInstance instance{std::make_shared<LoxClass>(*this)};
+  auto instance{
+      std::make_shared<LoxInstance>(std::make_shared<LoxClass>(*this))};
   return instance;
 }
 

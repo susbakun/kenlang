@@ -15,6 +15,8 @@ class Assign;
 class Logical;
 class Call;
 class Anonymous;
+class Get;
+class Set;
 
 class Stmt;
 
@@ -29,6 +31,8 @@ struct ExprVisitor {
   virtual Object visit_logical_expr(Logical &expr) = 0;
   virtual Object visit_call_expr(Call &expr) = 0;
   virtual Object visit_anonymous_func_expr(Anonymous &expr) = 0;
+  virtual Object visit_get_expr(Get &expr) = 0;
+  virtual Object visit_set_expr(Set &expr) = 0;
 
   virtual ~ExprVisitor() = default;
 };
@@ -148,4 +152,24 @@ public:
 
   std::vector<Token> m_parameters{};
   std::vector<std::unique_ptr<Stmt>> m_body{};
+};
+
+class Get : public Expr {
+public:
+  Get(std::unique_ptr<Expr> obj, Token &name);
+  Object accept(ExprVisitor &visitor);
+
+  std::unique_ptr<Expr> m_obj;
+  Token m_name;
+};
+
+class Set : public Expr {
+public:
+  Set(std::unique_ptr<Expr> obj, Token &name, std::unique_ptr<Expr> value);
+
+  Object accept(ExprVisitor &visitor) override;
+
+  std::unique_ptr<Expr> m_obj;
+  Token m_name;
+  std::unique_ptr<Expr> m_value;
 };

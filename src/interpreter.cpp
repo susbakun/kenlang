@@ -8,6 +8,7 @@
 #include "lox_callable.hpp"
 #include "lox_class.hpp"
 #include "lox_function.hpp"
+#include "lox_instance.hpp"
 #include "return_exception.hpp"
 #include "runtime_error.hpp"
 #include "statement.hpp"
@@ -184,6 +185,28 @@ Object Interpreter::visit_anonymous_func_expr(Anonymous &expr) {
   auto ann{std::make_shared<Anonymous>(std::move(expr))};
 
   return std::make_shared<LoxFunction>(ann, m_environment);
+}
+
+Object Interpreter::visit_get_expr(Get &expr) {
+  auto obj{evaluate(*expr.m_obj)};
+
+  if (std::holds_alternative<std::shared_ptr<LoxInstance>>(obj)) {
+    return std::get<std::shared_ptr<LoxInstance>>(obj)->get(expr.m_name);
+  }
+
+  throw RuntimeError{expr.m_name, "Only instances can have properties."};
+}
+
+Object Interpreter::visit_set_expr(Set &expr) {
+  auto obj{evaluate(*expr.m_obj)};
+
+  if (!std::holds_alternative<std::shared_ptr<LoxInstance>>(obj)) {
+    throw RuntimeError{expr.m_name, "Only instances have fields."};
+  }
+
+  auto value{evaluate(*expr.m_value)};
+  std::get<std::shared_ptr<LoxInstance>>(obj)->set(expr.m_name, value);
+  return value;
 }
 
 void Interpreter::visit_expression_stmt(Expression &stmt) {

@@ -36,6 +36,10 @@ std::unique_ptr<Expr> Parser::assignment() {
     if (auto var = dynamic_cast<Var *>(expr.get())) {
       auto name{var->m_name};
       return std::make_unique<Assign>(name, std::move(value));
+    } else if (auto var = dynamic_cast<Get *>(expr.get())) {
+      auto name{var->m_name};
+      return std::make_unique<Set>(std::move(var->m_obj), name,
+                                   std::move(value));
     }
 
     error(equals, "Invalid assignment target.");
@@ -140,7 +144,7 @@ std::unique_ptr<Expr> Parser::factor() {
 std::unique_ptr<Expr> Parser::unary() {
   if (match({BANG, MINUS})) {
     auto op{previous()};
-    auto right{primary()};
+    auto right{call()};
 
     return std::make_unique<Unary>(op, std::move(right));
   }
@@ -154,6 +158,9 @@ std::unique_ptr<Expr> Parser::call() {
   while (true) {
     if (match({LEFT_PAREN})) {
       expr = finish_call(std::move(expr));
+    } else if (match({DOT})) {
+      auto name{consume(IDENTIFIER, "Expect a name after '.'")};
+      expr = std::make_unique<Get>(std::move(expr), name);
     } else {
       break;
     }

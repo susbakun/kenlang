@@ -1,5 +1,7 @@
 #include "expression.hpp"
+#include "literal.hpp"
 #include "statement.hpp"
+#include <memory>
 
 Binary::Binary(std::unique_ptr<Expr> left, Token &op,
                std::unique_ptr<Expr> right)
@@ -42,6 +44,12 @@ Anonymous::Anonymous(Anonymous &&) noexcept = default;
 
 Anonymous::~Anonymous() = default;
 
+Get::Get(std::unique_ptr<Expr> obj, Token &name)
+    : m_obj{std::move(obj)}, m_name{name} {}
+
+Set::Set(std::unique_ptr<Expr> obj, Token &name, std::unique_ptr<Expr> value)
+    : m_obj{std::move(obj)}, m_name{name}, m_value{std::move(value)} {}
+
 Object Binary::accept(ExprVisitor &visitor) {
   return visitor.visit_binary_expr(*this);
 }
@@ -80,4 +88,12 @@ Object Call::accept(ExprVisitor &visitor) {
 
 Object Anonymous::accept(ExprVisitor &visitor) {
   return visitor.visit_anonymous_func_expr(*this);
+}
+
+Object Get::accept(ExprVisitor &visitor) {
+  return visitor.visit_get_expr(*this);
+}
+
+Object Set::accept(ExprVisitor &visitor) {
+  return visitor.visit_set_expr(*this);
 }
