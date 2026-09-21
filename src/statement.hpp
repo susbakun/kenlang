@@ -15,6 +15,7 @@ class Break;
 class Continue;
 class Function;
 class Return;
+class Class;
 
 struct StmtVisitor {
   virtual void visit_expression_stmt(Expression &stmt) = 0;
@@ -27,6 +28,7 @@ struct StmtVisitor {
   virtual void visit_continue_stmt(Continue &stmt) = 0;
   virtual void visit_function_stmt(Function &stmt) = 0;
   virtual void visit_return_stmt(Return &stmt) = 0;
+  virtual void visit_class_stmt(Class &stmt) = 0;
 
   virtual ~StmtVisitor() = default;
 };
@@ -146,4 +148,18 @@ public:
 
   Token m_keyword;
   std::unique_ptr<Expr> m_value{};
+};
+
+class Class : public Stmt {
+public:
+  Class(Token &name, std::unique_ptr<Var> superclass,
+        std::vector<std::unique_ptr<Function>> methods)
+      : m_name{name}, m_superclass{std::move(superclass)},
+        m_methods{std::move(methods)} {}
+
+  void accept(StmtVisitor &visitor);
+
+  Token m_name;
+  std::unique_ptr<Var> m_superclass;
+  std::vector<std::unique_ptr<Function>> m_methods;
 };

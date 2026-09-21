@@ -40,6 +40,7 @@ public:
   void visit_continue_stmt(Continue &stmt) override;
   void visit_function_stmt(Function &stmt) override;
   void visit_return_stmt(Return &stmt) override;
+  void visit_class_stmt(Class &stmt) override;
 
   void resolve(Expr &expr, int depth);
 

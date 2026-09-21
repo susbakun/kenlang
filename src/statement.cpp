@@ -37,3 +37,7 @@ void Function::accept(StmtVisitor &visitor) {
 void Return::accept(StmtVisitor &visitor) {
   return visitor.visit_return_stmt(*this);
 }
+
+void Class::accept(StmtVisitor &visitor) {
+  return visitor.visit_class_stmt(*this);
+}

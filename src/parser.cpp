@@ -229,6 +229,8 @@ std::unique_ptr<Expr> Parser::anonymous_function() {
 
 std::unique_ptr<Stmt> Parser::declaration() {
   try {
+    if (match({CLASS}))
+      return class_declration();
     // we need to exlude the anonymous functions here
     if (check(FUN) && check_next(IDENTIFIER))
       return function("function");
@@ -243,7 +245,24 @@ std::unique_ptr<Stmt> Parser::declaration() {
   }
 }
 
-std::unique_ptr<Stmt> Parser::function(std::string_view kind) {
+std::unique_ptr<Class> Parser::class_declration() {
+  auto name{consume(IDENTIFIER, "Expect class name")};
+  consume(LEFT_BRACE, "Expect '{' before class body");
+
+  std::vector<std::unique_ptr<Function>> methods{};
+  while (!check(RIGHT_BRACE) && !is_at_end()) {
+    methods.push_back(function("method"));
+  }
+
+  consume(RIGHT_BRACE, "Expect '}' after class body");
+
+  std::unique_ptr<Var> superclass{nullptr};
+
+  return std::make_unique<Class>(name, std::move(superclass),
+                                 std::move(methods));
+}
+
+std::unique_ptr<Function> Parser::function(std::string_view kind) {
   auto name{consume(IDENTIFIER, "Expect " + std::string(kind) + " name.")};
   consume(LEFT_PAREN, "Expect '(' after " + std::string(kind) + " name.");
 
@@ -265,7 +284,7 @@ std::unique_ptr<Stmt> Parser::function(std::string_view kind) {
                                     std::move(body));
 }
 
-std::unique_ptr<Stmt> Parser::var_declaration() {
+std::unique_ptr<Variable> Parser::var_declaration() {
   auto name{consume(IDENTIFIER, "Expect variable name")};
 
   std::unique_ptr<Expr> initilizer{nullptr};
@@ -348,7 +367,7 @@ std::unique_ptr<Stmt> Parser::for_statement() {
   return body;
 }
 
-std::unique_ptr<Stmt> Parser::if_statement() {
+std::unique_ptr<If> Parser::if_statement() {
   consume(LEFT_PAREN, "Expect '(' after 'if'.");
   auto condition{expression()};
   consume(RIGHT_PAREN, "Expect ')' after if condition.");
@@ -363,13 +382,13 @@ std::unique_ptr<Stmt> Parser::if_statement() {
                               std::move(else_branch));
 }
 
-std::unique_ptr<Stmt> Parser::print_statement() {
+std::unique_ptr<Print> Parser::print_statement() {
   auto value{expression()};
   consume(SEMICOLON, "Expected ; after a statement");
   return std::make_unique<Print>(std::move(value));
 }
 
-std::unique_ptr<Stmt> Parser::return_statement() {
+std::unique_ptr<Return> Parser::return_statement() {
   auto keyword{previous()};
   std::unique_ptr<Expr> value{nullptr};
 
@@ -381,7 +400,7 @@ std::unique_ptr<Stmt> Parser::return_statement() {
   return std::make_unique<Return>(keyword, std::move(value));
 }
 
-std::unique_ptr<Stmt> Parser::while_statement() {
+std::unique_ptr<While> Parser::while_statement() {
   consume(LEFT_PAREN, "Expect '(' after 'while'.");
   auto condition{expression()};
   consume(RIGHT_PAREN, "Expect ')' after while condition.");
@@ -392,7 +411,7 @@ std::unique_ptr<Stmt> Parser::while_statement() {
   return std::make_unique<While>(std::move(condition), std::move(body));
 }
 
-std::unique_ptr<Stmt> Parser::break_statement() {
+std::unique_ptr<Break> Parser::break_statement() {
   auto keyword{previous()};
 
   // check if we're inside a loop
@@ -414,7 +433,7 @@ std::vector<std::unique_ptr<Stmt>> Parser::block() {
   return statements;
 }
 
-std::unique_ptr<Stmt> Parser::expression_statement() {
+std::unique_ptr<Expression> Parser::expression_statement() {
   auto value{expression()};
   consume(SEMICOLON, "Expected ; after a statement");
   return std::make_unique<Expression>(std::move(value));

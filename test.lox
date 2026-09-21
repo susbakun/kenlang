@@ -1,6 +1,7 @@
-var a = 2;
-
-{
-    var b = 2;
-
+class DevonshireCream {
+  serveOn() {
+    return "Scones";
+  }
 }
+
+print DevonshireCream; // Prints "DevonshireCream".

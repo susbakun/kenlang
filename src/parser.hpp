@@ -39,17 +39,18 @@ private:
   std::unique_ptr<Expr> anonymous_function();
 
   std::unique_ptr<Stmt> declaration();
-  std::unique_ptr<Stmt> function(std::string_view kind);
-  std::unique_ptr<Stmt> var_declaration();
+  std::unique_ptr<Class> class_declration();
+  std::unique_ptr<Function> function(std::string_view kind);
+  std::unique_ptr<Variable> var_declaration();
   std::unique_ptr<Stmt> statement();
   std::unique_ptr<Stmt> for_statement();
-  std::unique_ptr<Stmt> if_statement();
-  std::unique_ptr<Stmt> print_statement();
-  std::unique_ptr<Stmt> return_statement();
-  std::unique_ptr<Stmt> while_statement();
-  std::unique_ptr<Stmt> break_statement();
+  std::unique_ptr<If> if_statement();
+  std::unique_ptr<Print> print_statement();
+  std::unique_ptr<Return> return_statement();
+  std::unique_ptr<While> while_statement();
+  std::unique_ptr<Break> break_statement();
   std::vector<std::unique_ptr<Stmt>> block();
-  std::unique_ptr<Stmt> expression_statement();
+  std::unique_ptr<Expression> expression_statement();
 
   bool match(std::initializer_list<TokenType> types);
   Token consume(TokenType type, std::string_view message);

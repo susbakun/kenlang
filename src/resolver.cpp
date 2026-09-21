@@ -130,6 +130,11 @@ void Resolver::visit_while_stmt(While &stmt) {
   resolve(*stmt.m_body);
 }
 
+void Resolver::visit_class_stmt(Class &stmt) {
+  declare(stmt.m_name);
+  define(stmt.m_name);
+}
+
 void Resolver::begin_scope() {
   m_scopes.push(std::unordered_map<std::string, VariableState>{});
 }

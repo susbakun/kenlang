@@ -44,6 +44,7 @@ public:
   void visit_print_stmt(Print &stmt) override;
   void visit_return_stmt(Return &stmt) override;
   void visit_while_stmt(While &stmt) override;
+  void visit_class_stmt(Class &stmt) override;
 
   void resolve(const std::vector<std::unique_ptr<Stmt>> &statements);
 

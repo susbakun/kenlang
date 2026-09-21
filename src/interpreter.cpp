@@ -6,6 +6,7 @@
 #include "literal.hpp"
 #include "lox.hpp"
 #include "lox_callable.hpp"
+#include "lox_class.hpp"
 #include "lox_function.hpp"
 #include "return_exception.hpp"
 #include "runtime_error.hpp"
@@ -260,6 +261,12 @@ void Interpreter::visit_return_stmt(Return &stmt) {
     value = evaluate(*stmt.m_value);
 
   throw ReturnException{value};
+}
+
+void Interpreter::visit_class_stmt(Class &stmt) {
+  m_environment->define(stmt.m_name.m_lexeme, std::monostate{});
+  LoxClass klass{LoxClass{stmt.m_name.m_lexeme}};
+  m_environment->assign(stmt.m_name, klass);
 }
 
 void Interpreter::resolve(Expr &expr, int depth) {

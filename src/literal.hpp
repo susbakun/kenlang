@@ -1,5 +1,6 @@
 #pragma once
 
+#include "lox_class.hpp"
 #include <memory>
 #include <sstream>
 #include <string>
@@ -8,7 +9,7 @@
 class LoxCallable;
 
 using Object = std::variant<std::monostate, double, std::string, bool,
-                            std::shared_ptr<LoxCallable>>;
+                            std::shared_ptr<LoxCallable>, LoxClass>;
 
 inline std::string literal_to_string(const Object &literal) {
   return std::visit(
@@ -23,6 +24,8 @@ inline std::string literal_to_string(const Object &literal) {
           return value ? "true" : "false";
         } else if constexpr (std::is_same_v<T, std::shared_ptr<LoxCallable>>) {
           return "loxcallable";
+        } else if constexpr (std::is_same_v<T, LoxClass>) {
+          return std::string(value);
         } else if constexpr (std::is_same_v<T, double>) {
           std::ostringstream out;
           out << value;
