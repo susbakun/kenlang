@@ -153,7 +153,7 @@ public:
 class Class : public Stmt {
 public:
   Class(Token &name, std::unique_ptr<Var> superclass,
-        std::vector<std::unique_ptr<Function>> methods)
+        std::vector<std::shared_ptr<Function>> methods)
       : m_name{name}, m_superclass{std::move(superclass)},
         m_methods{std::move(methods)} {}
 
@@ -161,5 +161,5 @@ public:
 
   Token m_name;
   std::unique_ptr<Var> m_superclass;
-  std::vector<std::unique_ptr<Function>> m_methods;
+  std::vector<std::shared_ptr<Function>> m_methods;
 };

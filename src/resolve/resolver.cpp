@@ -146,6 +146,11 @@ void Resolver::visit_while_stmt(While &stmt) {
 void Resolver::visit_class_stmt(Class &stmt) {
   declare(stmt.m_name);
   define(stmt.m_name);
+
+  for (const auto &method : stmt.m_methods) {
+    FunctionType declaration{FunctionType::METHOD};
+    resolve_function(*method, declaration);
+  }
 }
 
 void Resolver::begin_scope() {

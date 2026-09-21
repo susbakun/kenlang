@@ -256,7 +256,7 @@ std::unique_ptr<Class> Parser::class_declration() {
   auto name{consume(IDENTIFIER, "Expect class name")};
   consume(LEFT_BRACE, "Expect '{' before class body");
 
-  std::vector<std::unique_ptr<Function>> methods{};
+  std::vector<std::shared_ptr<Function>> methods{};
   while (!check(RIGHT_BRACE) && !is_at_end()) {
     methods.push_back(function("method"));
   }

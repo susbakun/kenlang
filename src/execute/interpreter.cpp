@@ -15,6 +15,7 @@
 #include "environment.hpp"
 
 #include <iostream>
+#include <map>
 #include <memory>
 #include <string>
 #include <variant>
@@ -288,7 +289,17 @@ void Interpreter::visit_return_stmt(Return &stmt) {
 
 void Interpreter::visit_class_stmt(Class &stmt) {
   m_environment->define(stmt.m_name.m_lexeme, std::monostate{});
-  auto klass{std::make_shared<LoxClass>(stmt.m_name.m_lexeme)};
+
+  std::map<std::string, std::shared_ptr<LoxFunction>> methods{};
+  for (auto &method : stmt.m_methods) {
+    auto lf{std::make_shared<LoxFunction>(method, m_environment)};
+
+    methods.insert({method->m_name.m_lexeme, lf});
+  }
+
+  auto klass{
+      std::make_shared<LoxClass>(stmt.m_name.m_lexeme, std::move(methods))};
+
   m_environment->assign(stmt.m_name, klass);
 }
 

@@ -14,6 +14,10 @@ Object LoxInstance::get(Token &name) const {
     return m_fields.at(name);
   }
 
+  auto method{m_klass->find_method(name.m_lexeme)};
+  if (method != nullptr)
+    return method;
+
   throw RuntimeError{name, "Undefined property '" + name.m_lexeme + "'."};
 }
 
