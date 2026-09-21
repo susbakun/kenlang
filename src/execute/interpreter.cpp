@@ -210,6 +210,10 @@ Object Interpreter::visit_set_expr(Set &expr) {
   return value;
 }
 
+Object Interpreter::visit_this_expr(This &expr) {
+  return lookup_variable(expr.m_keyword, expr);
+}
+
 void Interpreter::visit_expression_stmt(Expression &stmt) {
   evaluate(*stmt.m_expression);
 }

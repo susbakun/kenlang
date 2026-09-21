@@ -91,6 +91,16 @@ Object Resolver::visit_set_expr(Set &expr) {
   return std::monostate{};
 }
 
+Object Resolver::visit_this_expr(This &expr) {
+  if (m_current_class == ClassType::NONE) {
+    Lox::error(expr.m_keyword, "Can't use 'this' outside class");
+  }
+
+  resolve_local(expr, expr.m_keyword);
+
+  return std::monostate{};
+}
+
 void Resolver::visit_block_stmt(Block &stmt) {
   begin_scope();
   resolve(stmt.m_statements);
@@ -144,13 +154,23 @@ void Resolver::visit_while_stmt(While &stmt) {
 }
 
 void Resolver::visit_class_stmt(Class &stmt) {
+  auto enclosing_class{m_current_class};
+  m_current_class = ClassType::CLASS;
+
   declare(stmt.m_name);
   define(stmt.m_name);
+
+  begin_scope();
+  m_scopes.top().insert({"this", {true, true, stmt.m_name.m_line}});
 
   for (const auto &method : stmt.m_methods) {
     FunctionType declaration{FunctionType::METHOD};
     resolve_function(*method, declaration);
   }
+
+  m_current_class = enclosing_class;
+
+  end_scope();
 }
 
 void Resolver::begin_scope() {

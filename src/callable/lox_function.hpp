@@ -10,6 +10,12 @@
 
 class LoxFunction : public LoxCallable {
 public:
+  using Declaration =
+      std::variant<std::shared_ptr<Function>, std::shared_ptr<Anonymous>>;
+
+  LoxFunction(Declaration declaration, std::shared_ptr<Environment> closure)
+      : m_declration{std::move(declaration)}, m_closure{std::move(closure)} {}
+
   LoxFunction(std::shared_ptr<Function> declration,
               std::shared_ptr<Environment> closure)
       : m_declration{std::move(declration)}, m_closure{closure} {}
@@ -21,10 +27,11 @@ public:
   Object call(Interpreter &interpreter,
               std::vector<Object> &arguments) override;
 
+  LoxFunction bind(const LoxInstance &instance);
+
   int arity() const override;
 
 private:
-  std::variant<std::shared_ptr<Function>, std::shared_ptr<Anonymous>>
-      m_declration;
+  Declaration m_declration;
   std::shared_ptr<Environment> m_closure{};
 };

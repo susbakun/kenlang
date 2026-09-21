@@ -12,6 +12,7 @@
 #include <vector>
 
 enum class FunctionType { NONE, FUNCTION, METHOD };
+enum class ClassType { NONE, CLASS };
 
 struct VariableState {
   bool defined;
@@ -35,6 +36,7 @@ public:
   Object visit_anonymous_func_expr(Anonymous &expr) override;
   Object visit_get_expr(Get &expr) override;
   Object visit_set_expr(Set &expr) override;
+  Object visit_this_expr(This &expr) override;
 
   void visit_block_stmt(Block &stmt) override;
   void visit_var_stmt(Variable &stmt) override;
@@ -66,4 +68,5 @@ private:
   Interpreter &m_interpreter;
   std::stack<std::unordered_map<std::string, VariableState>> m_scopes{};
   FunctionType m_current_function{FunctionType::NONE};
+  ClassType m_current_class{ClassType::NONE};
 };

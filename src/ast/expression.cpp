@@ -50,6 +50,8 @@ Get::Get(std::unique_ptr<Expr> obj, Token &name)
 Set::Set(std::unique_ptr<Expr> obj, Token &name, std::unique_ptr<Expr> value)
     : m_obj{std::move(obj)}, m_name{name}, m_value{std::move(value)} {}
 
+This::This(const Token &keyword) : m_keyword{keyword} {};
+
 Object Binary::accept(ExprVisitor &visitor) {
   return visitor.visit_binary_expr(*this);
 }
@@ -96,4 +98,8 @@ Object Get::accept(ExprVisitor &visitor) {
 
 Object Set::accept(ExprVisitor &visitor) {
   return visitor.visit_set_expr(*this);
+}
+
+Object This::accept(ExprVisitor &visitor) {
+  return visitor.visit_this_expr(*this);
 }

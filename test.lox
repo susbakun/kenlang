@@ -1,7 +1,11 @@
 class Bacon {
   eat() {
-    print "Crunch crunch crunch!";
+    print "eating " + this.amount + " bacon";
   }
 }
 
-Bacon().eat(); // Prints "Crunch crunch crunch!".
+var bacon = Bacon();
+bacon.amount = 2;
+bacon.eat();
+
+print this;

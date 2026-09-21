@@ -2,6 +2,8 @@
 #include "../errors/runtime_error.hpp"
 #include "../token/literal.hpp"
 #include "lox_class.hpp"
+#include "lox_function.hpp"
+#include <memory>
 
 LoxInstance::LoxInstance(std::shared_ptr<LoxClass> klass) : m_klass{klass} {}
 
@@ -16,7 +18,7 @@ Object LoxInstance::get(Token &name) const {
 
   auto method{m_klass->find_method(name.m_lexeme)};
   if (method != nullptr)
-    return method;
+    return std::make_shared<LoxFunction>(method->bind(*this));
 
   throw RuntimeError{name, "Undefined property '" + name.m_lexeme + "'."};
 }

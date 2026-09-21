@@ -201,6 +201,10 @@ std::unique_ptr<Expr> Parser::primary() {
     return std::make_unique<Literal>(previous().m_literal);
   }
 
+  if (match({THIS})) {
+    return std::make_unique<This>(previous());
+  }
+
   if (match({IDENTIFIER})) {
     return std::make_unique<Var>(previous());
   }

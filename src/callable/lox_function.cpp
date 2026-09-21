@@ -3,7 +3,9 @@
 #include "../execute/environment.hpp"
 #include "../execute/interpreter.hpp"
 #include "../token/literal.hpp"
+#include "lox_instance.hpp"
 #include <cstddef>
+#include <memory>
 #include <variant>
 
 Object LoxFunction::call(Interpreter &interpreter,
@@ -31,6 +33,13 @@ Object LoxFunction::call(Interpreter &interpreter,
   }
 
   return std::monostate{};
+}
+
+LoxFunction LoxFunction::bind(const LoxInstance &instance) {
+  Environment environment{m_closure};
+  environment.define("this", std::make_shared<LoxInstance>(instance));
+
+  return LoxFunction{m_declration, std::make_shared<Environment>(environment)};
 }
 
 int LoxFunction::arity() const {

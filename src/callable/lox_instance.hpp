@@ -11,6 +11,7 @@ class LoxClass;
 class LoxInstance {
 public:
   LoxInstance(std::shared_ptr<LoxClass> klass);
+
   std::string to_string() const;
 
   Object get(Token &name) const;

@@ -17,6 +17,7 @@ class Call;
 class Anonymous;
 class Get;
 class Set;
+class This;
 
 class Stmt;
 
@@ -33,6 +34,7 @@ struct ExprVisitor {
   virtual Object visit_anonymous_func_expr(Anonymous &expr) = 0;
   virtual Object visit_get_expr(Get &expr) = 0;
   virtual Object visit_set_expr(Set &expr) = 0;
+  virtual Object visit_this_expr(This &expr) = 0;
 
   virtual ~ExprVisitor() = default;
 };
@@ -172,4 +174,13 @@ public:
   std::unique_ptr<Expr> m_obj;
   Token m_name;
   std::unique_ptr<Expr> m_value;
+};
+
+class This : public Expr {
+public:
+  This(const Token &keyword);
+
+  Object accept(ExprVisitor &visitor) override;
+
+  Token m_keyword;
 };
