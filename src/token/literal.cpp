@@ -1,7 +1,7 @@
 
 
 #include "literal.hpp"
-#include "lox_instance.hpp"
+#include "../callable/lox_instance.hpp"
 #include <sstream>
 #include <string>
 

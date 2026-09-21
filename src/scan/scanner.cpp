@@ -1,7 +1,7 @@
 #include "scanner.hpp"
-#include "lox.hpp"
-#include "token.hpp"
-#include "tokentype.hpp"
+#include "../lox.hpp"
+#include "../token/token.hpp"
+#include "../token/tokentype.hpp"
 #include <cctype>
 #include <variant>
 

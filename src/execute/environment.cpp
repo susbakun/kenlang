@@ -1,7 +1,7 @@
 #include "environment.hpp"
-#include "literal.hpp"
-#include "runtime_error.hpp"
-#include "token.hpp"
+#include "../errors/runtime_error.hpp"
+#include "../token/literal.hpp"
+#include "../token/token.hpp"
 #include <cstddef>
 #include <memory>
 #include <string>

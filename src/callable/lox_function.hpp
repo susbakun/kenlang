@@ -1,10 +1,10 @@
 #pragma once
 
-#include "environment.hpp"
-#include "expression.hpp"
-#include "literal.hpp"
+#include "../ast/expression.hpp"
+#include "../ast/statement.hpp"
+#include "../execute/environment.hpp"
+#include "../token/literal.hpp"
 #include "lox_callable.hpp"
-#include "statement.hpp"
 #include <memory>
 #include <variant>
 

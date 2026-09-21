@@ -1,6 +1,6 @@
 #pragma once
 
-#include "literal.hpp"
+#include "../token/literal.hpp"
 #include <vector>
 
 class Interpreter; // forward-declared — call() only needs a reference

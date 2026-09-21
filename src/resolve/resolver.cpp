@@ -1,7 +1,7 @@
 #include "resolver.hpp"
-#include "expression.hpp"
-#include "literal.hpp"
-#include "lox.hpp"
+#include "../ast/expression.hpp"
+#include "../lox.hpp"
+#include "../token/literal.hpp"
 #include <string>
 #include <unordered_map>
 #include <variant>

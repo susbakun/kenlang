@@ -1,9 +1,9 @@
 #pragma once
 
-#include "interpreter.hpp"
-#include "runtime_error.hpp"
-#include "token.hpp"
-#include "tokentype.hpp"
+#include "errors/runtime_error.hpp"
+#include "execute/interpreter.hpp"
+#include "token/token.hpp"
+#include "token/tokentype.hpp"
 #include <iostream>
 #include <print>
 #include <string>

@@ -1,8 +1,8 @@
 #include "lox.hpp"
-#include "parser.hpp"
-#include "resolver.hpp"
-#include "scanner.hpp"
-#include "token.hpp"
+#include "ast/parser.hpp"
+#include "resolve/resolver.hpp"
+#include "scan/scanner.hpp"
+#include "token/token.hpp"
 
 #include <fstream>
 #include <iostream>

@@ -1,5 +1,5 @@
 #include "lox_class.hpp"
-#include "literal.hpp"
+#include "../token/literal.hpp"
 #include "lox_instance.hpp"
 #include <memory>
 

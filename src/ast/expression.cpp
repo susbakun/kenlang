@@ -1,5 +1,5 @@
-#include "expression.hpp"
-#include "literal.hpp"
+#include "../ast/expression.hpp"
+#include "../token/literal.hpp"
 #include "statement.hpp"
 #include <memory>
 

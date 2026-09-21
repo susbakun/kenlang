@@ -1,8 +1,8 @@
 #pragma once
 
-#include "literal.hpp"
-#include "token.hpp"
-#include "tokentype.hpp"
+#include "../token/literal.hpp"
+#include "../token/token.hpp"
+#include "../token/tokentype.hpp"
 #include <map>
 #include <string>
 #include <vector>

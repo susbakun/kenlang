@@ -1,11 +1,11 @@
 #pragma once
 
-#include "clock.hpp"
+#include "../ast/expression.hpp"
+#include "../ast/statement.hpp"
+#include "../callable/clock.hpp"
+#include "../token/literal.hpp"
+#include "../token/token.hpp"
 #include "environment.hpp"
-#include "expression.hpp"
-#include "literal.hpp"
-#include "statement.hpp"
-#include "token.hpp"
 #include <map>
 #include <memory>
 #include <vector>

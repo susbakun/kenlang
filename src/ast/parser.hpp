@@ -1,9 +1,9 @@
 #pragma once
 
+#include "../token/token.hpp"
+#include "../token/tokentype.hpp"
 #include "expression.hpp"
 #include "statement.hpp"
-#include "token.hpp"
-#include "tokentype.hpp"
 #include <initializer_list>
 #include <memory>
 #include <stdexcept>

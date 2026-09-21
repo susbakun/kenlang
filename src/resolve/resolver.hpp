@@ -1,10 +1,10 @@
 #pragma once
 
-#include "expression.hpp"
-#include "interpreter.hpp"
-#include "literal.hpp"
-#include "statement.hpp"
-#include "token.hpp"
+#include "../ast/expression.hpp"
+#include "../ast/statement.hpp"
+#include "../execute/interpreter.hpp"
+#include "../token/literal.hpp"
+#include "../token/token.hpp"
 #include <memory>
 #include <stack>
 #include <string>

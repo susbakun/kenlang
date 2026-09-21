@@ -1,9 +1,9 @@
 #include "parser.hpp"
+#include "../lox.hpp"
+#include "../token/token.hpp"
+#include "../token/tokentype.hpp"
 #include "expression.hpp"
-#include "lox.hpp"
 #include "statement.hpp"
-#include "token.hpp"
-#include "tokentype.hpp"
 #include <memory>
 #include <string>
 #include <string_view>

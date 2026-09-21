@@ -1,6 +1,6 @@
 #pragma once
 
-#include "literal.hpp"
+#include "../token/literal.hpp"
 #include "lox_callable.hpp"
 
 class Clock : public LoxCallable {

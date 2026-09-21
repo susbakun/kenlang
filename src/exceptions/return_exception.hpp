@@ -1,6 +1,6 @@
 #pragma once
 
-#include "literal.hpp"
+#include "../token/literal.hpp"
 
 class ReturnException {
 public:

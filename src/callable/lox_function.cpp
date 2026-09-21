@@ -1,8 +1,8 @@
 #include "lox_function.hpp"
-#include "environment.hpp"
-#include "interpreter.hpp"
-#include "literal.hpp"
-#include "return_exception.hpp"
+#include "../exceptions/return_exception.hpp"
+#include "../execute/environment.hpp"
+#include "../execute/interpreter.hpp"
+#include "../token/literal.hpp"
 #include <cstddef>
 #include <variant>
 

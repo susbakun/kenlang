@@ -1,7 +1,7 @@
 #include "lox_instance.hpp"
-#include "literal.hpp"
+#include "../errors/runtime_error.hpp"
+#include "../token/literal.hpp"
 #include "lox_class.hpp"
-#include "runtime_error.hpp"
 
 LoxInstance::LoxInstance(std::shared_ptr<LoxClass> klass) : m_klass{klass} {}
 

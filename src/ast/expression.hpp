@@ -1,7 +1,7 @@
 #pragma once
 
-#include "literal.hpp"
-#include "token.hpp"
+#include "../token/literal.hpp"
+#include "../token/token.hpp"
 #include <memory>
 #include <vector>
 

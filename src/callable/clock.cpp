@@ -1,5 +1,5 @@
+
 #include "clock.hpp"
-#include "literal.hpp"
 #include <chrono>
 
 int Clock::arity() const { return 0; }
