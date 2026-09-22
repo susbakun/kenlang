@@ -1,11 +1,12 @@
 class Bacon {
-  eat() {
-    print "eating " + this.amount + " bacon";
-  }
+    init(amount) {
+        this.amount = 2;
+    }
+
+    eat() {
+        print this.amount;
+    }
 }
 
-var bacon = Bacon();
-bacon.amount = 2;
+var bacon = Bacon(2);
 bacon.eat();
-
-print this;

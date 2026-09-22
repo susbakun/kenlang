@@ -13,25 +13,20 @@ public:
   using Declaration =
       std::variant<std::shared_ptr<Function>, std::shared_ptr<Anonymous>>;
 
-  LoxFunction(Declaration declaration, std::shared_ptr<Environment> closure)
-      : m_declration{std::move(declaration)}, m_closure{std::move(closure)} {}
-
-  LoxFunction(std::shared_ptr<Function> declration,
-              std::shared_ptr<Environment> closure)
-      : m_declration{std::move(declration)}, m_closure{closure} {}
-
-  LoxFunction(std::shared_ptr<Anonymous> declration,
-              std::shared_ptr<Environment> closure)
-      : m_declration{std::move(declration)}, m_closure{closure} {}
+  LoxFunction(Declaration declaration, std::shared_ptr<Environment> closure,
+              bool is_initilizer)
+      : m_declration{std::move(declaration)}, m_closure{std::move(closure)},
+        m_is_initilizer{is_initilizer} {}
 
   Object call(Interpreter &interpreter,
               std::vector<Object> &arguments) override;
 
-  LoxFunction bind(const LoxInstance &instance);
+  LoxFunction bind(const std::shared_ptr<LoxInstance> instance);
 
   int arity() const override;
 
 private:
   Declaration m_declration;
   std::shared_ptr<Environment> m_closure{};
+  bool m_is_initilizer{};
 };

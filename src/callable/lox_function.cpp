@@ -29,17 +29,24 @@ Object LoxFunction::call(Interpreter &interpreter,
         },
         m_declration);
   } catch (ReturnException &exception) {
+    if (m_is_initilizer)
+      return m_closure->get_at(0, "this");
+
     return exception.m_value;
   }
+
+  if (m_is_initilizer)
+    return m_closure->get_at(0, "this");
 
   return std::monostate{};
 }
 
-LoxFunction LoxFunction::bind(const LoxInstance &instance) {
+LoxFunction LoxFunction::bind(const std::shared_ptr<LoxInstance> instance) {
   Environment environment{m_closure};
-  environment.define("this", std::make_shared<LoxInstance>(instance));
+  environment.define("this", instance);
 
-  return LoxFunction{m_declration, std::make_shared<Environment>(environment)};
+  return LoxFunction{m_declration, std::make_shared<Environment>(environment),
+                     m_is_initilizer};
 }
 
 int LoxFunction::arity() const {

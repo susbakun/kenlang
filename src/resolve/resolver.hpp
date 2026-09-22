@@ -11,7 +11,7 @@
 #include <unordered_map>
 #include <vector>
 
-enum class FunctionType { NONE, FUNCTION, METHOD };
+enum class FunctionType { NONE, FUNCTION, METHOD, INITILIZER };
 enum class ClassType { NONE, CLASS };
 
 struct VariableState {

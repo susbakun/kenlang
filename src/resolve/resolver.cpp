@@ -144,6 +144,10 @@ void Resolver::visit_return_stmt(Return &stmt) {
     Lox::error(stmt.m_keyword, "Can't return from top-level code.");
   }
 
+  if (m_current_function == FunctionType::INITILIZER) {
+    Lox::error(stmt.m_keyword, "Can't return a value from a class initilizer.");
+  }
+
   if (stmt.m_value != nullptr)
     resolve(*stmt.m_value);
 }
@@ -165,6 +169,9 @@ void Resolver::visit_class_stmt(Class &stmt) {
 
   for (const auto &method : stmt.m_methods) {
     FunctionType declaration{FunctionType::METHOD};
+    if (method->m_name.m_lexeme == "init")
+      declaration = FunctionType::INITILIZER;
+
     resolve_function(*method, declaration);
   }
 

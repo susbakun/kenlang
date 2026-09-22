@@ -8,13 +8,13 @@
 
 class LoxClass;
 
-class LoxInstance {
+class LoxInstance : public std::enable_shared_from_this<LoxInstance> {
 public:
   LoxInstance(std::shared_ptr<LoxClass> klass);
 
   std::string to_string() const;
 
-  Object get(Token &name) const;
+  Object get(Token &name);
   void set(Token &name, Object value);
 
 private:

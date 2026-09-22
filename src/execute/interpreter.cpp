@@ -185,7 +185,7 @@ Object Interpreter::visit_call_expr(Call &expr) {
 Object Interpreter::visit_anonymous_func_expr(Anonymous &expr) {
   auto ann{std::make_shared<Anonymous>(std::move(expr))};
 
-  return std::make_shared<LoxFunction>(ann, m_environment);
+  return std::make_shared<LoxFunction>(ann, m_environment, false);
 }
 
 Object Interpreter::visit_get_expr(Get &expr) {
@@ -267,8 +267,8 @@ void Interpreter::visit_function_stmt(Function &stmt) {
   auto name{stmt.m_name.m_lexeme};
   auto function{std::make_shared<Function>(std::move(stmt))};
 
-  m_environment->define(name,
-                        std::make_shared<LoxFunction>(function, m_environment));
+  m_environment->define(
+      name, std::make_shared<LoxFunction>(function, m_environment, false));
 }
 
 Object Interpreter::evaluate(Expr &expr) { return expr.accept(*this); }
@@ -296,7 +296,9 @@ void Interpreter::visit_class_stmt(Class &stmt) {
 
   std::map<std::string, std::shared_ptr<LoxFunction>> methods{};
   for (auto &method : stmt.m_methods) {
-    auto lf{std::make_shared<LoxFunction>(method, m_environment)};
+    bool is_initilizer{method->m_name.m_lexeme == "init"};
+    auto lf{
+        std::make_shared<LoxFunction>(method, m_environment, is_initilizer)};
 
     methods.insert({method->m_name.m_lexeme, lf});
   }

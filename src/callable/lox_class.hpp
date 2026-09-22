@@ -23,7 +23,7 @@ public:
 
   int arity() const override;
 
-  std::shared_ptr<LoxFunction> find_method(std::string &name);
+  std::shared_ptr<LoxFunction> find_method(const std::string &name) const;
 
   std::string m_name{};
   std::map<std::string, std::shared_ptr<LoxFunction>> m_methods{};
