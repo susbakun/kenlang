@@ -46,8 +46,10 @@ LoxFunction LoxFunction::bind(const std::shared_ptr<LoxInstance> instance) {
   environment.define("this", instance);
 
   return LoxFunction{m_declration, std::make_shared<Environment>(environment),
-                     m_is_initilizer};
+                     m_is_initilizer, m_is_getter};
 }
+
+bool LoxFunction::is_getter() const { return m_is_getter; }
 
 int LoxFunction::arity() const {
   return std::visit(

@@ -128,15 +128,16 @@ public:
 class Function : public Stmt {
 public:
   Function(Token &name, std::vector<Token> parameters,
-           std::vector<std::unique_ptr<Stmt>> body)
+           std::vector<std::unique_ptr<Stmt>> body, bool is_getter)
       : m_name{name}, m_parameters{std::move(parameters)},
-        m_body{std::move(body)} {}
+        m_body{std::move(body)}, m_is_getter{is_getter} {}
 
   void accept(StmtVisitor &visitor) override;
 
   Token m_name;
   std::vector<Token> m_parameters{};
   std::vector<std::unique_ptr<Stmt>> m_body{};
+  bool m_is_getter{};
 };
 
 class Return : public Stmt {

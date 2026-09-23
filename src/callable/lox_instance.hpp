@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../execute/interpreter.hpp"
 #include "../token/literal.hpp"
 #include "../token/token.hpp"
 #include <map>
@@ -14,7 +15,7 @@ public:
 
   std::string to_string() const;
 
-  Object get(Token &name);
+  Object get(Token &name, Interpreter &interpreter);
   void set(Token &name, Object value);
 
 private:

@@ -275,24 +275,28 @@ std::unique_ptr<Class> Parser::class_declration() {
 
 std::unique_ptr<Function> Parser::function(std::string_view kind) {
   auto name{consume(IDENTIFIER, "Expect " + std::string(kind) + " name.")};
-  consume(LEFT_PAREN, "Expect '(' after " + std::string(kind) + " name.");
 
+  bool is_getter{false};
   std::vector<Token> parameters{};
-  if (!check(RIGHT_PAREN)) {
-    do {
-      if (parameters.size() >= 255) {
-        error(peek(), "Can't have more than 255 parameters.");
-      }
-      parameters.push_back(consume(IDENTIFIER, "Expect parameter name."));
-    } while (match({COMMA}));
+
+  if (kind == "method" && check(LEFT_BRACE)) {
+    is_getter = true;
+  } else {
+    consume(LEFT_PAREN, "Expect '(' after " + std::string(kind) + " name.");
+    if (!check(RIGHT_PAREN)) {
+      do {
+        if (parameters.size() >= 255) {
+          error(peek(), "Can't have more than 255 parameters.");
+        }
+        parameters.push_back(consume(IDENTIFIER, "Expect parameter name."));
+      } while (match({COMMA}));
+    }
+    consume(RIGHT_PAREN, "Expect ')' after parameters.");
   }
-
-  consume(RIGHT_PAREN, "Expect ')' after parameters.");
-
   consume(LEFT_BRACE, "Expect '{' before " + std::string(kind) + " body.");
   auto body{block()};
   return std::make_unique<Function>(name, std::move(parameters),
-                                    std::move(body));
+                                    std::move(body), is_getter);
 }
 
 std::unique_ptr<Variable> Parser::var_declaration() {

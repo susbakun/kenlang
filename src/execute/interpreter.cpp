@@ -185,14 +185,14 @@ Object Interpreter::visit_call_expr(Call &expr) {
 Object Interpreter::visit_anonymous_func_expr(Anonymous &expr) {
   auto ann{std::make_shared<Anonymous>(std::move(expr))};
 
-  return std::make_shared<LoxFunction>(ann, m_environment, false);
+  return std::make_shared<LoxFunction>(ann, m_environment, false, false);
 }
 
 Object Interpreter::visit_get_expr(Get &expr) {
   auto obj{evaluate(*expr.m_obj)};
 
   if (std::holds_alternative<std::shared_ptr<LoxInstance>>(obj)) {
-    return std::get<std::shared_ptr<LoxInstance>>(obj)->get(expr.m_name);
+    return std::get<std::shared_ptr<LoxInstance>>(obj)->get(expr.m_name, *this);
   }
 
   throw RuntimeError{expr.m_name, "Only instances can have properties."};
@@ -267,8 +267,8 @@ void Interpreter::visit_function_stmt(Function &stmt) {
   auto name{stmt.m_name.m_lexeme};
   auto function{std::make_shared<Function>(std::move(stmt))};
 
-  m_environment->define(
-      name, std::make_shared<LoxFunction>(function, m_environment, false));
+  m_environment->define(name, std::make_shared<LoxFunction>(
+                                  function, m_environment, false, false));
 }
 
 Object Interpreter::evaluate(Expr &expr) { return expr.accept(*this); }
@@ -297,8 +297,8 @@ void Interpreter::visit_class_stmt(Class &stmt) {
   std::map<std::string, std::shared_ptr<LoxFunction>> methods{};
   for (auto &method : stmt.m_methods) {
     bool is_initilizer{method->m_name.m_lexeme == "init"};
-    auto lf{
-        std::make_shared<LoxFunction>(method, m_environment, is_initilizer)};
+    auto lf{std::make_shared<LoxFunction>(method, m_environment, is_initilizer,
+                                          method->m_is_getter)};
 
     methods.insert({method->m_name.m_lexeme, lf});
   }
