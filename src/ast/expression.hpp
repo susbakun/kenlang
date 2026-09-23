@@ -18,6 +18,7 @@ class Anonymous;
 class Get;
 class Set;
 class This;
+class Super;
 
 class Stmt;
 
@@ -35,6 +36,7 @@ struct ExprVisitor {
   virtual Object visit_get_expr(Get &expr) = 0;
   virtual Object visit_set_expr(Set &expr) = 0;
   virtual Object visit_this_expr(This &expr) = 0;
+  virtual Object visit_super_expr(Super &expr) = 0;
 
   virtual ~ExprVisitor() = default;
 };
@@ -51,9 +53,9 @@ public:
 
   Object accept(ExprVisitor &visitor) override;
 
-  const std::unique_ptr<Expr> m_left;
+  std::unique_ptr<Expr> m_left;
   const Token m_op;
-  const std::unique_ptr<Expr> m_right;
+  std::unique_ptr<Expr> m_right;
 };
 
 class Grouping : public Expr {
@@ -62,7 +64,7 @@ public:
 
   Object accept(ExprVisitor &visitor) override;
 
-  const std::unique_ptr<Expr> m_expression;
+  std::unique_ptr<Expr> m_expression;
 };
 
 class Literal : public Expr {
@@ -76,27 +78,27 @@ public:
 
 class Unary : public Expr {
 public:
-  Unary(Token &op, std::unique_ptr<Expr> right);
+  Unary(const Token &op, std::unique_ptr<Expr> right);
 
   Object accept(ExprVisitor &visitor) override;
 
   const Token m_operator;
-  const std::unique_ptr<Expr> m_right;
+  std::unique_ptr<Expr> m_right;
 };
 
 class Ternary : public Expr {
 public:
-  Ternary(std::unique_ptr<Expr> left, Token &left_operator,
-          std::unique_ptr<Expr> mid, Token &right_operator,
+  Ternary(std::unique_ptr<Expr> left, const Token &left_operator,
+          std::unique_ptr<Expr> mid, const Token &right_operator,
           std::unique_ptr<Expr> right);
 
   Object accept(ExprVisitor &visitor) override;
 
-  const std::unique_ptr<Expr> m_left;
+  std::unique_ptr<Expr> m_left;
   const Token m_left_operator;
-  const std::unique_ptr<Expr> m_mid;
+  std::unique_ptr<Expr> m_mid;
   const Token m_right_operator;
-  const std::unique_ptr<Expr> m_right;
+  std::unique_ptr<Expr> m_right;
 };
 
 class Var : public Expr {
@@ -115,36 +117,37 @@ public:
   Object accept(ExprVisitor &visitor) override;
 
   const Token m_name;
-  const std::unique_ptr<Expr> m_value{};
+  std::unique_ptr<Expr> m_value{};
 };
 
 class Logical : public Expr {
 public:
-  Logical(std::unique_ptr<Expr> left, Token &op, std::unique_ptr<Expr> right);
+  Logical(std::unique_ptr<Expr> left, const Token &op,
+          std::unique_ptr<Expr> right);
 
   Object accept(ExprVisitor &visitor) override;
 
   std::unique_ptr<Expr> m_left{};
-  Token m_operator;
+  const Token m_operator;
   std::unique_ptr<Expr> m_right{};
 };
 
 class Call : public Expr {
 public:
-  Call(std::unique_ptr<Expr> callee, Token &paren,
+  Call(std::unique_ptr<Expr> callee, const Token &paren,
        std::vector<std::unique_ptr<Expr>> arguments);
 
   Object accept(ExprVisitor &visitor) override;
 
   std::unique_ptr<Expr> m_callee{};
-  Token m_paren;
+  const Token m_paren;
   std::vector<std::unique_ptr<Expr>> m_arguments{};
 };
 
 class Anonymous : public Expr {
 public:
-  Anonymous(std::vector<Token> parameters,
-            std::vector<std::unique_ptr<Stmt>> body);
+  Anonymous(const std::vector<Token> parameters,
+            const std::vector<std::unique_ptr<Stmt>> body);
 
   Anonymous(Anonymous &&) noexcept;
 
@@ -158,21 +161,23 @@ public:
 
 class Get : public Expr {
 public:
-  Get(std::unique_ptr<Expr> obj, Token &name);
+  Get(std::unique_ptr<Expr> obj, const Token &name);
+
   Object accept(ExprVisitor &visitor);
 
   std::unique_ptr<Expr> m_obj;
-  Token m_name;
+  const Token m_name;
 };
 
 class Set : public Expr {
 public:
-  Set(std::unique_ptr<Expr> obj, Token &name, std::unique_ptr<Expr> value);
+  Set(std::unique_ptr<Expr> obj, const Token &name,
+      std::unique_ptr<Expr> value);
 
   Object accept(ExprVisitor &visitor) override;
 
   std::unique_ptr<Expr> m_obj;
-  Token m_name;
+  const Token m_name;
   std::unique_ptr<Expr> m_value;
 };
 
@@ -182,5 +187,15 @@ public:
 
   Object accept(ExprVisitor &visitor) override;
 
-  Token m_keyword;
+  const Token m_keyword;
+};
+
+class Super : public Expr {
+public:
+  Super(const Token &keyword, const Token &method);
+
+  Object accept(ExprVisitor &visitor) override;
+
+  const Token m_keyword;
+  const Token m_method;
 };

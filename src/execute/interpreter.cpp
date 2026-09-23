@@ -223,6 +223,30 @@ Object Interpreter::visit_this_expr(This &expr) {
   return lookup_variable(expr.m_keyword, expr);
 }
 
+Object Interpreter::visit_super_expr(Super &expr) {
+  auto distance{m_locals.at(&expr)};
+
+  auto obj{m_environment->get_at(distance, "super")};
+  auto callable{std::get<std::shared_ptr<LoxCallable>>(obj)};
+
+  if (auto klass = std::dynamic_pointer_cast<LoxClass>(callable)) {
+    obj = m_environment->get_at(distance - 1, "this");
+    auto this_obj{std::get<std::shared_ptr<LoxInstance>>(obj)};
+
+    auto method{klass->find_method(expr.m_method.m_lexeme)};
+
+    if (method == nullptr) {
+      throw RuntimeError{expr.m_method, "Undefined property " +
+                                            expr.m_method.m_lexeme +
+                                            " on superclass"};
+    }
+
+    return std::make_shared<LoxFunction>(method->bind(this_obj));
+  }
+
+  throw RuntimeError{expr.m_keyword, "Super must reference to class"};
+}
+
 void Interpreter::visit_expression_stmt(Expression &stmt) {
   evaluate(*stmt.m_expression);
 }
@@ -323,6 +347,12 @@ void Interpreter::visit_class_stmt(Class &stmt) {
 
   m_environment->define(stmt.m_name.m_lexeme, std::monostate{});
 
+  // making new environment and add super in it (for methods)
+  if (superclass != nullptr) {
+    m_environment = std::make_shared<Environment>(m_environment);
+    m_environment->define("super", superclass);
+  }
+
   std::map<std::string, std::shared_ptr<LoxFunction>> methods{};
   for (auto &method : stmt.m_methods) {
     bool is_initilizer{method->m_name.m_lexeme == "init"};
@@ -338,6 +368,11 @@ void Interpreter::visit_class_stmt(Class &stmt) {
                                           method->m_is_getter)};
 
     static_methods.insert({method->m_name.m_lexeme, lf});
+  }
+
+  // remove the created environment for super
+  if (superclass != nullptr) {
+    m_environment = m_environment->get_enclosing();
   }
 
   auto klass{std::make_shared<LoxClass>(stmt.m_name.m_lexeme, superclass,

@@ -32,6 +32,7 @@ public:
   Object visit_get_expr(Get &expr) override;
   Object visit_set_expr(Set &expr) override;
   Object visit_this_expr(This &expr) override;
+  Object visit_super_expr(Super &expr) override;
 
   void visit_expression_stmt(Expression &stmt) override;
   void visit_print_stmt(Print &stmt) override;

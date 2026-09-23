@@ -12,7 +12,7 @@ std::string LoxInstance::to_string() const {
   return m_klass->m_name + " instance";
 }
 
-Object LoxInstance::get(Token &name, Interpreter &interpreter) {
+Object LoxInstance::get(const Token &name, Interpreter &interpreter) {
   if (m_fields.contains(name)) {
     return m_fields.at(name);
   }
@@ -30,4 +30,6 @@ Object LoxInstance::get(Token &name, Interpreter &interpreter) {
   throw RuntimeError{name, "Undefined property '" + name.m_lexeme + "'."};
 }
 
-void LoxInstance::set(Token &name, Object value) { m_fields[name] = value; }
+void LoxInstance::set(const Token &name, const Object value) {
+  m_fields[name] = value;
+}

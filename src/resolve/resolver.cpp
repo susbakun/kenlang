@@ -101,6 +101,19 @@ Object Resolver::visit_this_expr(This &expr) {
   return std::monostate{};
 }
 
+Object Resolver::visit_super_expr(Super &expr) {
+  if (m_current_class == ClassType::NONE) {
+    Lox::error(expr.m_keyword, "Can't use 'super' outside of a class.");
+  } else if (m_current_class != ClassType::SUBCLASS) {
+    Lox::error(expr.m_keyword,
+               "Can't use 'super' with a class with no superclass.");
+  }
+
+  resolve_local(expr, expr.m_keyword);
+
+  return std::monostate{};
+}
+
 void Resolver::visit_block_stmt(Block &stmt) {
   begin_scope();
   resolve(stmt.m_statements);
@@ -170,7 +183,13 @@ void Resolver::visit_class_stmt(Class &stmt) {
   }
 
   if (stmt.m_superclass != nullptr) {
+    m_current_class = ClassType::SUBCLASS;
     resolve(*stmt.m_superclass);
+
+    // creating a scope arround the current class
+    begin_scope();
+    auto &scope{m_scopes.top()};
+    scope.insert({"super", {true, true, stmt.m_name.m_line}});
   }
 
   begin_scope();
@@ -192,6 +211,10 @@ void Resolver::visit_class_stmt(Class &stmt) {
   m_current_class = enclosing_class;
 
   end_scope();
+
+  // removing the surround
+  if (stmt.m_superclass != nullptr)
+    end_scope();
 }
 
 void Resolver::begin_scope() {

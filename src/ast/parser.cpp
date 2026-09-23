@@ -201,6 +201,13 @@ std::unique_ptr<Expr> Parser::primary() {
     return std::make_unique<Literal>(previous().m_literal);
   }
 
+  if (match({SUPER})) {
+    auto keyword{previous()};
+    consume(DOT, "Expected '.' after 'super'.");
+    auto method{consume(IDENTIFIER, "Expect super class method name.")};
+    return std::make_unique<Super>(keyword, method);
+  }
+
   if (match({THIS})) {
     return std::make_unique<This>(previous());
   }

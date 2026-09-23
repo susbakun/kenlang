@@ -13,6 +13,8 @@ public:
   explicit Environment(std::shared_ptr<Environment> enclosing)
       : m_enclosing{std::move(enclosing)} {}
 
+  std::shared_ptr<Environment> get_enclosing() const;
+
   Object get(const Token &name) const;
   Object get_at(int distance, const std::string &name);
   std::shared_ptr<Environment> ancestor(int distance);

@@ -17,8 +17,8 @@ public:
 
   std::string to_string() const;
 
-  Object get(Token &name, Interpreter &interpreter);
-  void set(Token &name, Object value);
+  Object get(const Token &name, Interpreter &interpreter);
+  void set(const Token &name, const Object value);
 
 private:
   std::shared_ptr<LoxClass> m_klass{};

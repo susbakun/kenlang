@@ -7,6 +7,10 @@
 #include <string>
 #include <variant>
 
+std::shared_ptr<Environment> Environment::get_enclosing() const {
+  return m_enclosing;
+}
+
 Object Environment::get(const Token &name) const {
   if (m_map.contains(name.m_lexeme)) {
     if (std::holds_alternative<std::monostate>(m_map.at(name.m_lexeme))) {
