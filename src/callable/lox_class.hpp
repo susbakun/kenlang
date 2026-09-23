@@ -10,10 +10,10 @@
 
 class LoxClass : public LoxCallable {
 public:
-  LoxClass(std::string &name,
+  LoxClass(std::string &name, std::shared_ptr<LoxClass> superclass,
            std::map<std::string, std::shared_ptr<LoxFunction>> methods,
            std::map<std::string, std::shared_ptr<LoxFunction>> static_methods)
-      : m_name{name}, m_methods{std::move(methods)},
+      : m_name{name}, m_superclass{superclass}, m_methods{std::move(methods)},
         m_static_methods{std::move(static_methods)} {}
 
   operator std::string() const { return m_name; }
@@ -31,6 +31,7 @@ public:
   find_static_method(const std::string &name) const;
 
   std::string m_name{};
+  std::shared_ptr<LoxClass> m_superclass{};
   std::map<std::string, std::shared_ptr<LoxFunction>> m_methods{};
   std::map<std::string, std::shared_ptr<LoxFunction>> m_static_methods{};
 };

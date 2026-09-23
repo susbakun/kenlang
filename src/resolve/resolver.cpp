@@ -164,6 +164,15 @@ void Resolver::visit_class_stmt(Class &stmt) {
   declare(stmt.m_name);
   define(stmt.m_name);
 
+  if (stmt.m_superclass != nullptr &&
+      stmt.m_superclass->m_name.m_lexeme == stmt.m_name.m_lexeme) {
+    Lox::error(stmt.m_superclass->m_name, "A class can't inherit from itself.");
+  }
+
+  if (stmt.m_superclass != nullptr) {
+    resolve(*stmt.m_superclass);
+  }
+
   begin_scope();
   m_scopes.top().insert({"this", {true, true, stmt.m_name.m_line}});
 

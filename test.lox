@@ -1,7 +1,3 @@
-class Math {
-  class square(n) {
-    return n * n;
-  }
-}
+var NotAClass = "I am totally not a class";
 
-print Math.square(3); // Prints "9".
+class Subclass < NotAClass {} // ?!

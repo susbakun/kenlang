@@ -258,10 +258,18 @@ std::unique_ptr<Stmt> Parser::declaration() {
 
 std::unique_ptr<Class> Parser::class_declration() {
   auto name{consume(IDENTIFIER, "Expect class name")};
+
+  std::unique_ptr<Var> superclass{nullptr};
+  if (match({LESS})) {
+    auto name{consume(IDENTIFIER, "Expected a name after '<'.")};
+    superclass = std::make_unique<Var>(name);
+  }
+
   consume(LEFT_BRACE, "Expect '{' before class body");
 
   std::vector<std::shared_ptr<Function>> methods{};
   std::vector<std::shared_ptr<Function>> static_methods{};
+
   while (!check(RIGHT_BRACE) && !is_at_end()) {
     auto is_static{match({CLASS})};
     auto method{function("method")};
@@ -273,8 +281,6 @@ std::unique_ptr<Class> Parser::class_declration() {
   }
 
   consume(RIGHT_BRACE, "Expect '}' after class body");
-
-  std::unique_ptr<Var> superclass{nullptr};
 
   return std::make_unique<Class>(name, std::move(superclass),
                                  std::move(methods), std::move(static_methods));

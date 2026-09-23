@@ -301,6 +301,26 @@ void Interpreter::visit_return_stmt(Return &stmt) {
 }
 
 void Interpreter::visit_class_stmt(Class &stmt) {
+  std::shared_ptr<LoxClass> superclass{};
+  if (stmt.m_superclass != nullptr) {
+    auto superclass_obj{evaluate(*stmt.m_superclass)};
+
+    if (!std::holds_alternative<std::shared_ptr<LoxCallable>>(superclass_obj)) {
+      throw RuntimeError{stmt.m_superclass->m_name,
+                         "Superclass must be a class."};
+    }
+
+    auto callable{std::get<std::shared_ptr<LoxCallable>>(superclass_obj)};
+    auto klass = std::dynamic_pointer_cast<LoxClass>(callable);
+
+    if (klass == nullptr) {
+      throw RuntimeError{stmt.m_superclass->m_name,
+                         "Superclass must be a class."};
+    }
+
+    superclass = klass;
+  }
+
   m_environment->define(stmt.m_name.m_lexeme, std::monostate{});
 
   std::map<std::string, std::shared_ptr<LoxFunction>> methods{};
@@ -320,8 +340,9 @@ void Interpreter::visit_class_stmt(Class &stmt) {
     static_methods.insert({method->m_name.m_lexeme, lf});
   }
 
-  auto klass{std::make_shared<LoxClass>(
-      stmt.m_name.m_lexeme, std::move(methods), std::move(static_methods))};
+  auto klass{std::make_shared<LoxClass>(stmt.m_name.m_lexeme, superclass,
+                                        std::move(methods),
+                                        std::move(static_methods))};
 
   m_environment->assign(stmt.m_name, klass);
 }
