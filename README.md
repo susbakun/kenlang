@@ -16,17 +16,20 @@ Kenlang can scan, parse, and interpret this subset of Lox:
 - Blocks, `if`/`else`, `while`, `for`, and `break`.
 - Named functions, anonymous functions, calls, parameters, `return`, and
   closures.
+- Classes, instances, fields, methods, initializers, getters, inheritance,
+  `this`, and `super`.
 - The built-in `clock()` function, which returns the Unix time in seconds.
 - Line comments and nested block comments.
 
 Syntax and runtime errors are reported with their source line. The language is
-still in progress: classes, inheritance, and other later chapters from the
-book are not implemented yet.
+resolved before execution, allowing it to report invalid local-variable use,
+invalid `this`/`super` usage, and unused local variables. The language is
+still in progress and may diverge from the book for C++ experiments.
 
 ## Requirements
 
 - CMake 3.15 or newer
-- A C++23-capable Clang compiler (the CMake configuration uses Homebrew LLVM)
+- A C++23-capable compiler
 
 ## Build
 
@@ -73,25 +76,38 @@ twice(fun (value) {
 });
 ```
 
+Classes support methods and inheritance:
+
+```lox
+class Doughnut {
+  cook() { print "Fry until golden brown."; }
+}
+
+class BostonCream < Doughnut {
+  cook() {
+    super.cook();
+    print "Boston Cream";
+  }
+}
+
+BostonCream().cook();
+```
+
 ## Project layout
 
 ```text
 src/
-  scanner.*       Tokenizes Lox source
-  parser.*        Builds expression and statement ASTs
-  expression.*    Expression nodes and visitor interface
-  statement.*     Statement nodes and visitor interface
-  interpreter.*   Evaluates expressions and executes statements
-  environment.*   Chains lexical environments and variable bindings
-  lox_callable.*  Interface for callable Lox values
-  lox_function.*  Function calls and captured closures
-  clock.*         Built-in clock callable
-  runtime_error.* Represents interpreter errors with source-token context
-  *_exception.hpp Implements non-local loop and return control flow
-  token.*         Token representation
+  scan/           Tokenizes Lox source
+  token/          Token types, tokens, and runtime values
+  ast/            Expression/statement ASTs and the parser
+  execute/        Interpreter and chained lexical environments
+  callable/       Functions, closures, classes, instances, and `clock()`
+  resolve/        Static local-variable resolution and semantic checks
+  errors/         Runtime errors with source-token context
+  exceptions/     Non-local loop and return control flow
   lox.*           File and prompt entry points
   main.cpp        Executable entry point
-test.lox          Sample program
+test.lox          Sample inheritance program
 ```
 
 ## Learning resource
