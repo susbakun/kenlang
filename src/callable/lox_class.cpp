@@ -22,6 +22,10 @@ LoxClass::find_method(const std::string &name) const {
     return m_methods.at(name);
   }
 
+  if (m_superclass != nullptr) {
+    return m_superclass->find_method(name);
+  }
+
   return nullptr;
 }
 
