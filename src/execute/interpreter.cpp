@@ -195,6 +195,15 @@ Object Interpreter::visit_get_expr(Get &expr) {
     return std::get<std::shared_ptr<LoxInstance>>(obj)->get(expr.m_name, *this);
   }
 
+  if (std::holds_alternative<std::shared_ptr<LoxCallable>>(obj)) {
+    auto callable{std::get<std::shared_ptr<LoxCallable>>(obj)};
+    if (auto klass = std::dynamic_pointer_cast<LoxClass>(callable)) {
+      auto st_method{klass->find_static_method(expr.m_name.m_lexeme)};
+      if (st_method != nullptr)
+        return st_method;
+    }
+  }
+
   throw RuntimeError{expr.m_name, "Only instances can have properties."};
 }
 
@@ -303,8 +312,16 @@ void Interpreter::visit_class_stmt(Class &stmt) {
     methods.insert({method->m_name.m_lexeme, lf});
   }
 
-  auto klass{
-      std::make_shared<LoxClass>(stmt.m_name.m_lexeme, std::move(methods))};
+  std::map<std::string, std::shared_ptr<LoxFunction>> static_methods{};
+  for (auto &method : stmt.m_static_methods) {
+    auto lf{std::make_shared<LoxFunction>(method, m_environment, false,
+                                          method->m_is_getter)};
+
+    static_methods.insert({method->m_name.m_lexeme, lf});
+  }
+
+  auto klass{std::make_shared<LoxClass>(
+      stmt.m_name.m_lexeme, std::move(methods), std::move(static_methods))};
 
   m_environment->assign(stmt.m_name, klass);
 }

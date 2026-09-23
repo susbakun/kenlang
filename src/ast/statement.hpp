@@ -154,13 +154,16 @@ public:
 class Class : public Stmt {
 public:
   Class(Token &name, std::unique_ptr<Var> superclass,
-        std::vector<std::shared_ptr<Function>> methods)
+        std::vector<std::shared_ptr<Function>> methods,
+        std::vector<std::shared_ptr<Function>> static_methods)
       : m_name{name}, m_superclass{std::move(superclass)},
-        m_methods{std::move(methods)} {}
+        m_methods{std::move(methods)},
+        m_static_methods{std::move(static_methods)} {}
 
   void accept(StmtVisitor &visitor);
 
   Token m_name;
   std::unique_ptr<Var> m_superclass;
   std::vector<std::shared_ptr<Function>> m_methods;
+  std::vector<std::shared_ptr<Function>> m_static_methods;
 };

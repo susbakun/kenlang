@@ -175,6 +175,11 @@ void Resolver::visit_class_stmt(Class &stmt) {
     resolve_function(*method, declaration);
   }
 
+  for (const auto &method : stmt.m_static_methods) {
+    FunctionType declaration{FunctionType::METHOD};
+    resolve_function(*method, declaration);
+  }
+
   m_current_class = enclosing_class;
 
   end_scope();

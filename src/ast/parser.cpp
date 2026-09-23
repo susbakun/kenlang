@@ -261,8 +261,15 @@ std::unique_ptr<Class> Parser::class_declration() {
   consume(LEFT_BRACE, "Expect '{' before class body");
 
   std::vector<std::shared_ptr<Function>> methods{};
+  std::vector<std::shared_ptr<Function>> static_methods{};
   while (!check(RIGHT_BRACE) && !is_at_end()) {
-    methods.push_back(function("method"));
+    auto is_static{match({CLASS})};
+    auto method{function("method")};
+
+    if (is_static)
+      static_methods.push_back(std::move(method));
+    else
+      methods.push_back(std::move(method));
   }
 
   consume(RIGHT_BRACE, "Expect '}' after class body");
@@ -270,7 +277,7 @@ std::unique_ptr<Class> Parser::class_declration() {
   std::unique_ptr<Var> superclass{nullptr};
 
   return std::make_unique<Class>(name, std::move(superclass),
-                                 std::move(methods));
+                                 std::move(methods), std::move(static_methods));
 }
 
 std::unique_ptr<Function> Parser::function(std::string_view kind) {

@@ -25,6 +25,15 @@ LoxClass::find_method(const std::string &name) const {
   return nullptr;
 }
 
+std::shared_ptr<LoxFunction>
+LoxClass::find_static_method(const std::string &name) const {
+  if (m_static_methods.contains(name)) {
+    return m_static_methods.at(name);
+  }
+
+  return nullptr;
+}
+
 int LoxClass::arity() const {
   auto init{find_method("init")};
   if (init != nullptr)
